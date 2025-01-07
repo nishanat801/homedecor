@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Product List - Home Decor{% endblock %}
+
+{% block content %}
+<style>
+    .product-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    
+    .product-table th, .product-table td {
+        padding: 15px;
+        text-align: left;
+        border: 1px solid #ddd;
+    }
+    
+    .product-table th {
+        background-color: #4CAF50;
+        color: white;
+    }
+    
+    .product-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    
+    .product-table tr:hover {
+        background-color: #f1f1f1;
+    }
+    
+    /* Image Styling */
+    .product-image {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+    
+    a.btn {
+        padding: 5px 10px;
+        color: white;
+        text-decoration: none;
+        border-radius: 3px;
+        margin-right: 10px;
+        transition: background-color 0.3s;
+    }
+    
+    a.btn-edit {
+        background-color: #4CAF50;
+    }
+    
+    a.btn-edit:hover {
+        background-color: #45a049;
+    }
+    
+    a.btn-delete {
+        background-color: #f44336;
+    }
+    
+    a.btn-delete:hover {
+        background-color: #da190b;
+    }
+    
+    a.btn-add {
+        background-color: #2196F3;
+    }
+    
+    a.btn-add:hover {
+        background-color: #0b7dda;
+    }
+</style>
+<h1>Product List</h1>
+<table class="product-table">
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products %}
+        <tr>
+            <td><img src="{{ product.image.url }}" alt="Product Image" class="product-image"></td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.category }}</td>
+            <td>₹{{ product.price }}</td>
+            <td>{{ product.stock }}</td>
+            <td>
+                <a href="{% url 'products:edit_product' product.id %}" class="btn btn-edit">Edit</a>
+                <a href="{% url 'products:delete_product' product.id %}" class="btn btn-delete">Delete</a>
+                <a href="{% url 'products:add_product' %}" class="btn btn-add">Add</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

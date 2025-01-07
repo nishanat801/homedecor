@@ -1,0 +1,374 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Furniture Website</title>
+  <style>
+    /* General Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 7.6;
+      color: #333;
+      background-color: #f9f9f9;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    ul {
+      list-style: none;
+    }
+
+    header {
+      background: #1d1d1d;
+      color: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header nav ul {
+      display: flex;
+      gap: 1rem;
+    }
+
+    header nav ul li a {
+      color: #fff;
+      padding: 0.5rem 1rem;
+    }
+
+    header nav ul li a:hover {
+      background: #444;
+      border-radius: 5px;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: url("{% static 'images/home_1.jpg' %}") no-repeat center/cover;
+      text-align: center;
+      color: #fff;
+      padding: 5rem 2rem;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .hero input[type="text"] {
+      padding: 0.8rem;
+      width: 300px;
+      border: none;
+      border-radius: 5px 0 0 5px;
+    }
+
+    .hero button {
+      padding: 0.8rem 1.5rem;
+      background: #ff8c00;
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 0 5px 5px 0;
+    }
+    .login button {
+      padding: 1.8rem 1.5rem;
+      background: #ff8c00;
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 0 5px 5px 0;
+    }
+
+    .button:hover {
+      background: #e67600;
+      width:300px
+    }
+
+    /* Why Choosing Us */
+    .why {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+
+    .why h2 {
+      {% comment %} font-size: 2rem; {% endcomment %}
+      {% comment %} margin-bottom: 0rem; {% endcomment %}
+    }
+
+    .why-cards {
+      
+      display: flex;
+      justify-content: center;
+      gap: 0px;
+      margin-top: 2rem;
+    }
+
+    .why-card {
+      background: #fff;
+
+      padding: 1rem;
+      border-radius: 10px;
+      {% comment %} box-shadow: 0 2px 8px rgba(253, 252, 252, 0.1); {% endcomment %}
+      max-width: 300px;
+    }
+
+    .why-card h3 {
+      {% comment %} margin-bottom: 1rem; {% endcomment %}
+      {% comment %} font-size: 1.2rem; {% endcomment %}
+    }
+
+    /* Best Selling Products */
+    .products {
+      padding: 2rem;
+      background: #fff;
+    }
+
+    .products h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 2rem;
+    }
+
+    .product-list {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .product {
+      max-width: 250px;
+      background: #f9f9f9;
+      padding: 1rem;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .product img {
+      max-width: 100%;
+      border-radius: 10px;
+    }
+
+    .product h3 {
+      margin: 1rem 0;
+      font-size: 1.2rem;
+    }
+
+    .product .price {
+      font-weight: bold;
+      color: #ff8c00;
+    }
+
+    /* Testimonials */
+    .testimonials {
+      background: #f1f1f1;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+
+    .testimonials h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .testimonial-cards {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .testimonial-card {
+      max-width: 250px;
+      padding: 1rem;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .testimonial-card img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-bottom: 1rem;
+    }
+
+    .testimonial-card h3 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .testimonial-card p {
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    /* Footer */
+    footer {
+      background: #1d1d1d;
+      color: #fff;
+      padding: 2rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    footer .column {
+      max-width: 300px;
+    }
+
+    footer .column h3 {
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+
+    footer .column ul {
+      list-style: none;
+    }
+
+    footer .column ul li a {
+      color: #fff;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    footer .column ul li a:hover {
+      color: #ff8c00;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="logo">HomeDecor</div>
+    <nav>
+      <ul>
+        {% comment %} <li><a href="#">Furniture</a></li>
+        <li><a href="#">Product</a></li>
+        <li><a href="#">My Account</a></li>
+        <li><a href="#">Contact</a></li> {% endcomment %}
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Make Your Interior More Minimalistic & Modern</h1>
+    <p>Turn your room into a minimalist and modern aesthetic.</p>
+    <div>
+      {% comment %} <input type="text" placeholder="Search Furniture">
+      <button>Search</button> {% endcomment %}
+      <a href="{% url 'login' %}" class="button" style="background-color: orange; width: 300px; display: inline-block; text-align: center; padding: 10px; color: white; text-decoration: none;">Login First</a>
+
+    </form>
+    </div>
+  </section>
+
+  <!-- Why Choosing Us -->
+  <section class="why">
+    <h2>Our Popular Products</h2>
+    <div class="why-cards">
+      <div class="why-card"<div class="why-card" style="background: url('{% static 'images/home_model_chair.png' %}') no-repeat center/cover;"> >
+        <h3>Modern Sofa</h3>
+        {% comment %} <p>The advantage of hiring experts to create stylish furniture for your home.</p> {% endcomment %}
+      </div>
+      <div class="why-card"<div class="why-card" style="background: url('{% static 'images/home_met_3.jpg' %}') no-repeat center/cover;">>
+        <h3>Dining Table</h3>
+        {% comment %} <p>We ensure high-quality furniture at affordable prices.</p> {% endcomment %}
+      </div>
+      <div class="why-card" <div class="why-card" style="background: url('{% static 'images/home_chair_1.png' %}') no-repeat center/cover;">>
+        <h3>Single Chair</h3>
+        {% comment %} <p>Explore various styles that fit your living space.</p> {% endcomment %}
+      </div>
+      <div class="why-card" <div class="why-card" style="background: url('{% static 'images/home_chair_4.png' %}') no-repeat center/cover;">>
+        <h3>Moder chair</h3>
+        {% comment %} <p>Explore various styles that fit your living space.</p> {% endcomment %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Best Selling Products -->
+  <section class="products">
+    <h2>Best Selling Products</h2>
+    <div class="product-list">
+      <div class="product">
+        <img src="{% static 'images/home_chair_2.png' %}" alt="Home Image">
+        <h3>Stylish Chair</h3>
+        <p class="price">₹1999</p>
+      </div>
+      <div class="product">
+        <img src="{% static 'images/home_chair_4.png' %}" alt="Home Image">
+        <h3>Modern Chair</h3>
+        <p class="price">₹2499</p>
+      </div>
+      <div class="product">
+        <img src="{% static 'images/home_sofa_1.jpg' %}" alt="Home Image">
+        <h3>Modern Sofa</h3>
+        <p class="price">₹2499</p>
+        
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials">
+    <h2>Our Client Reviews</h2>
+    <div class="testimonial-cards">
+      <div class="testimonial-card">
+        <img src="{% static 'images/Ellipse 113m1.png' %}" alt="Home Image">
+        <h3>John Doe</h3>
+        <p>"Amazing service and quality!"</p>
+      </div>
+      <div class="testimonial-card">
+        <img src="{% static 'images/Ellipse 1131.png' %}" alt="Home Image">
+        <h3>Jane Smith</h3>
+        <p>"Beautiful furniture, highly recommend!"</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="column">
+      <h3>Customer Services</h3>
+      <ul>
+        <li><a href="#">Shipping & Delivery</a></li>
+        <li><a href="#">Return & Refund</a></li>
+      </ul>
+    </div>
+    <div class="column">
+      <h3>Shop Categories</h3>
+      <ul>
+        <li><a href="#">Chairs</a></li>
+        <li><a href="#">Tables</a></li>
+      </ul>
+    </div>
+    <div class="column">
+      <h3>Follow Us</h3>
+      <ul>
+        <li><a href="#">Facebook</a></li>
+        <li><a href="#">Twitter</a></li>
+      </ul>
+    </div>
+  </footer>
+</body>
+</html>

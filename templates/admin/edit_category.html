@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Category - Home Decor{% endblock %}
+
+{% block content %}
+<style>
+    /* General Reset */
+body, h1, h2, h3, p, ul, li, a, form, table {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-decoration: none;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    padding: 20px;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #222;
+    color: #fff;
+    padding: 15px 20px;
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar .logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.navbar .nav-links li {
+    display: inline;
+    margin-right: 20px;
+}
+
+.navbar .nav-links a {
+    color: #fff;
+    transition: color 0.3s;
+}
+
+.navbar .nav-links a:hover {
+    color: #ff9900;
+}
+
+/* Container for main content */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+}
+
+/* Form Styles (for editing or adding products/categories) */
+form {
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    text-align: left;
+}
+
+input, select, textarea, button {
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Table Styles (for Product and Category List) */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f4f4f4;
+}
+
+a {
+    text-decoration: none;
+    color: #007BFF;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Footer */
+footer {
+    background-color: #222;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    margin-top: 300px;
+}
+
+</style>
+    <h1>Edit Category</h1>
+
+    <!-- Display Error Message -->
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+
+    <!-- Edit Form -->
+    <form method="POST">
+        {% csrf_token %}
+        <label for="name">Category Name:</label>
+        <input type="text" id="name" name="name" value="{{ category.name }}" required>
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" rows="3">{{ category.description }}</textarea>
+
+        <button type="submit">Save Changes</button>
+    </form>
+{% endblock %}
+

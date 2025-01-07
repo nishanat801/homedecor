@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories and Products</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Header styles */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+            border-bottom: 1px solid #ddd;
+            overflow-x: auto;
+        }
+
+        .category {
+            text-align: center;
+            margin: 0 15px;
+        }
+
+        .category img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .category-name {
+            margin-top: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .category-name a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .category-name a:hover {
+            text-decoration: underline;
+        }
+
+        /* Product grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .product {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .product img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .product h3 {
+            margin: 10px 0;
+            font-size: 1.2em;
+        }
+
+        .product p {
+            font-size: 0.9em;
+            color: #555;
+            margin: 5px 0;
+        }
+
+        .product .price {
+            font-weight: bold;
+            color: #000;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with categories -->
+    <div class="header">
+        {% for category in categories %}
+            <div class="category">
+                <a href="/{{ category.id }}/">
+                    {% if category.image %}
+                        <img src="{{ category.image.url }}" alt="{{ category.name }}">
+                    {% else %}
+                        <img src="https://via.placeholder.com/100" alt="{{ category.name }}">
+                    {% endif %}
+                    <div class="category-name">{{ category.name }}</div>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Product grid -->
+    <div class="product-grid">
+        {% for product in products %}
+            <div class="product">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/150" alt="{{ product.name }}">
+                {% endif %}
+                <h3>{{ product.name }}</h3>
+                <p>{{ product.description }}</p>
+                <div class="price">${{ product.price }}</div>
+            </div>
+        {% empty %}
+            <p>No products available.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>

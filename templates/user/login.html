@@ -1,0 +1,215 @@
+{% extends 'homedecor_auth_base.html' %}
+
+{% block title %}Login - Home Decor{% endblock %}
+
+{% block header_title %}Login to Home Decor{% endblock %}
+
+{% block content %}
+<h2>Login</h2>
+<form method="POST" action="{% url 'Authentication:login_user' %}">
+    {% csrf_token %}
+    <label for="username">Username</label>
+    <input type="text" name="username" id="username" required>
+
+    <label for="password">Password</label>
+    <input type="password" name="password" id="password" required>
+
+    <button type="submit">Login</button>
+</form>
+<p>Don't have an account? <a href="{% url 'Authentication:signup_user' %}">Sign up</a></p>
+<p><a href="{% url 'Authentication:forgot_password' %}">Forgot Password?</a></p>
+{% endblock %}
+
+
+
+
+
+
+{% comment %} {% extends 'homedecor_auth_base.html' %}
+
+{% block title %}Login - Home Decor{% endblock %}
+
+{% block header_title %}Login to Home Decor{% endblock %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        /* Internal CSS */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #error-messages {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .forgot-password a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .signup-link a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+    </style> 
+</head>
+<body>
+    <div class="container">
+        <h1>Login</h1>
+        <form id="login-form" method="POST" action="">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            <div class="form-group">
+                <button type="submit">Login</button>
+            </div>
+            <div id="error-messages"></div>
+        </form>
+        <div class="forgot-password">
+            <a href="{% url 'Authentication:forgot_password' %}">Forgot Password?</a>
+        </div>
+        <div class="signup-link">
+            <a href="{% url 'Authentication:signup_user' %}">Don't have an account? Sign up</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("login-form").addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Reset error messages
+            document.getElementById("error-messages").innerHTML = "";
+
+            // Get the email and password values
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+
+            // Perform basic validation
+            if (!email || !password) {
+                document.getElementById("error-messages").innerHTML = "Both email and password are required.";
+                return;
+            }
+
+            // Send an AJAX request for login
+            fetch("{% url 'Authentication:login_user' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+                body: JSON.stringify({ email: email, password: password }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    window.location.href = data.redirect_url;
+                } else {
+                    document.getElementById("error-messages").innerHTML = Object.values(data.errors).join("<br>");
+                }
+            })
+            .catch(error => {
+                document.getElementById("error-messages").innerHTML = "An error occurred. Please try again.";
+            });
+        });
+    </script>
+</body>
+</html>
+{% endblock %} {% endcomment %}

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Product - Home Decor{% endblock %}
+
+{% block content %}
+<style>
+    /* Form Styling */
+form {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    text-align: left;
+}
+
+input, select, textarea, button {
+    width: 100%;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+textarea {
+    resize: vertical;
+}
+
+input[type="file"] {
+    padding: 6px;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+</style>
+    <h1>Edit Product</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <label for="name">Product Name</label>
+        <input type="text" id="name" name="name" value="{{ product.name }}" required>
+    
+        <label for="price">Price</label>
+        <input type="number" id="price" name="price" value="{{ product.price }}" required>
+    
+        <label for="stock">Stock</label>
+        <input type="number" id="stock" name="stock" value="{{ product.stock }}" required>
+    
+        <label for="category">Category</label>
+        <select id="category" name="category">
+            <option value="" disabled>Select a category</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if product.category.id == category.id %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select>
+    
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="3">{{ product.description }}</textarea>
+    
+        <label for="image">Image</label>
+        <input type="file" id="image" name="image">
+    
+        <button type="submit">Save Changes</button>
+    </form>
+{% endblock %}

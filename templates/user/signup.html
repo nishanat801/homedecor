@@ -1,0 +1,230 @@
+{% extends 'homedecor_auth_base.html' %}
+
+{% block title %}Sign Up - Home Decor{% endblock %}
+
+{% block header_title %}Create an Account{% endblock %}
+
+{% block content %}
+<h2>Sign Up</h2>
+<form method="POST" action="{% url 'Authentication:signup_user' %}">
+    {% csrf_token %}
+    <label for="username">Username</label>
+    <input type="text" value='example' name="username" id="username" required>
+
+    <label for="email">Email</label>
+    <input type="email" value="example@gmail.com" name="email" id="email" required>
+
+    <label for="password1">Password</label>
+    <input type="password" value="Example@123#" name="password1" id="password1" required>
+
+    <label for="password2">Confirm Password</label>
+    <input type="password" value="Example@123#" name="password2" id="password2" required>
+    {% if messages %}
+    {% for message in messages %}
+    <p style="color:red;"> {{ message }}</p>
+    {% endfor %} 
+    {% endif %}
+
+    <button type="submit">Sign Up</button>
+</form>
+<p>Already have an account? <a href="{% url 'Authentication:login_user' %}">Login</a></p>
+{% endblock %}
+
+
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        /* Internal CSS */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #error-messages {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .login-link a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sign Up</h1>
+        <form id="signup-form" method="POST" action="">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="password1">Password:</label>
+                <input type="password" id="password1" name="password1" placeholder="Enter your password" required>
+            </div>
+            <div class="form-group">
+                <label for="password2">Confirm Password:</label>
+                <input type="password" id="password2" name="password2" placeholder="Re-enter your password" required>
+            </div>
+            
+            <div class="form-group">
+                <button type="submit">Sign Up</button>
+            </div>
+            <div id="error-messages"></div>
+        </form>
+        <div class="login-link">
+            <a href="{% url 'Authentication:login_user' %}">Already have an account? Log in</a>
+        </div>
+    </div>
+    
+    <!-- Error messages container -->
+    <div id="error-messages" style="color: red;"></div>
+    
+    <!-- Include this script tag at the end of your HTML file or within a script block -->
+    <script>
+        const csrfToken = "{{ csrf_token }}";
+        document.getElementById("signup-form").addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent form submission
+            
+            // Reset error messages
+            document.getElementById("error-messages").innerHTML = "";
+            
+            // Get form values
+            const username = document.getElementById("username").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const password1 = document.getElementById("password1").value.trim();
+            const password2 = document.getElementById("password2").value.trim();
+            
+            // Basic validation
+            if (!username || !email || !password1 || !password2) {
+                document.getElementById("error-messages").innerHTML = "All fields are required.";
+                return;
+            }
+            
+            if (password1 !== password2) {
+                document.getElementById("error-messages").innerHTML = "Passwords do not match.";
+                return;
+            }
+            
+            // Prepare form data as JSON
+            const formData = {
+                username: username,
+                email: email,
+                password1: password1,
+                password2: password2
+            };
+            
+            // Send AJAX request for signup
+            fetch("{% url 'Authentication:signup_user' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",  // Send JSON data
+                    "X-CSRFToken": "{{ csrf_token }}",   // Django CSRF token
+                },
+                body: JSON.stringify(formData), // Send JSON data
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    // Redirect to OTP verification page
+                    window.location.href = data.redirect_url;
+                } else {
+                    // Display error messages if there are form errors
+                    document.getElementById("error-messages").innerHTML = Object.values(data.errors).join("<br>");
+                }
+            })
+            .catch(error => {
+                // Handle any errors that occur during the fetch
+                document.getElementById("error-messages").innerHTML = "An error occurred. Please try again.";
+            });
+        });
+        
+        
+    </script>
+    
+</body>
+</html> {% endcomment %}

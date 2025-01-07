@@ -1,0 +1,157 @@
+{% extends 'homedecor_auth_base.html' %}
+
+{% block title %}OTP Verification - Home Decor{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h3 style="text-align:center">Verify OTP</h3>
+    <form method="POST" id="otp-form" action="{% url 'Authentication:otp_verify' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="otp">Enter OTP:</label>
+            <input type="text" name="otp" id="otp" required>
+        </div>
+        <div class="form-group" style="text-align:center">
+            <button type="submit" >Verify OTP</button>
+        </div>
+        <div id="error-messages"></div>
+        <div id="success-message"></div>
+    </form>
+</div>
+{% endblock %}
+
+
+
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery for Ajax -->
+    <style>
+        /* Internal CSS */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f9fc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+            border-color: #4caf50;
+            outline: none;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #error-messages {
+            color: red;
+            font-size: 14px;
+        }
+
+        #success-message {
+            color: green;
+            font-size: 14px;
+        }
+
+        .resend {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .resend button {
+            background: none;
+            border: none;
+            color: #4caf50;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: underline;
+        }
+
+        .resend button:hover {
+            color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <form method="post" id="otp-form" action=""> 
+        {% csrf_token %}
+        <label for="otp">Enter OTP:</label>
+        <input type="text" name="otp" id="otp" required><br><br>
+        <button type="submit">Verify OTP</button>
+    </form>
+    <script>
+        document.getElementById('otp-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch(this.action, {
+                method: 'POST',
+                body: formData,
+            });
+            const data = await response.json();
+            if (data.status === 'success') {
+                window.location.href = data.redirect_url;
+            } else {
+                alert(data.errors.otp || data.message);
+            }
+        });
+    </script>
+    
+    </script>
+</body>
+</html> {% endcomment %}
