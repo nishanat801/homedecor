@@ -16,7 +16,7 @@ from . import views
 app_name = 'Authentication'
 
 urlpatterns = [
-    path('signup/', views.signup_view, name='signup_user'),
+    path('', views.signup_view, name='signup_user'),
     path('otp-verify/', views.otp_verify_view, name='otp_verify'),
     path('forgot-password/', views.forgot_password, name='forgot_password'),
     path('reset-password/', views.reset_password, name='reset_password'),

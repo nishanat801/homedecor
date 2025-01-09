@@ -9,7 +9,6 @@ from django.contrib.auth.decorators import user_passes_test
 def product_list(request):
     products = Product.objects.all()
     return render(request, 'admin/product_list.html', {'products': products})
-
 # add product
 def add_product(request):
     if request.method == 'POST':
@@ -49,7 +48,7 @@ def add_product(request):
          
         print("Product added, redirecting to product list...")
 
-        return redirect('product_list')
+        return redirect('products:product_list')
 
     # Render the add product page
     categories = Category.objects.filter(is_active=True)

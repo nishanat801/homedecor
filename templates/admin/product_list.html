@@ -69,6 +69,11 @@
     a.btn-add:hover {
         background-color: #0b7dda;
     }
+    td img {
+        max-width: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
 </style>
 <h1>Product List</h1>
 <table class="product-table">
@@ -85,7 +90,13 @@
     <tbody>
         {% for product in products %}
         <tr>
-            <td><img src="{{ product.image.url }}" alt="Product Image" class="product-image"></td>
+            <td>
+                 {% if product.image1 %}
+                <img src="{{ product.image1.url }}" alt="{{ product.name }}">
+              {% else %}
+                <span>No Image</span>
+              {% endif %}
+            </td>
             <td>{{ product.name }}</td>
             <td>{{ product.category }}</td>
             <td>₹{{ product.price }}</td>

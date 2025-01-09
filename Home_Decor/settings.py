@@ -144,6 +144,11 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
@@ -157,8 +162,8 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER ='homedecorp123@gmail.com'  # homedecor
-EMAIL_HOST_PASSWORD ='dvjtrsioydrycifz'  # home@@decor123
-
+EMAIL_HOST_PASSWORD ='dfwm wgbk ggdk jjpx'  # home@@decor123  
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_COOKIE_AGE = 300  # Session expires after 5 minutes (300 seconds)

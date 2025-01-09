@@ -37,6 +37,7 @@ def send_otp_email(to_email, otp):
         send_mail(subject, message, from_email, [to_email])
         logger.info(f"OTP email sent successfully to {to_email}")
         return True
+    
     except Exception as e:
         logger.error(f"Failed to send OTP email: {e}")
         return False
@@ -57,9 +58,9 @@ def signup_view(request):
                 print(otp)
                 # Create user
                 user = form.save(commit=False)
-                user.is_active = False 
+                user.is_active = True 
                 user.otp = otp
-                user.otp_expiry = datetime.datetime.now() + datetime.timedelta(minutes=5)
+                user.otp_expiry = now() + datetime.timedelta(minutes=5)
                 user.save()
 
                 return redirect('Authentication:otp_verify')
@@ -98,68 +99,58 @@ def signup_view(request):
 
 # OTP Verification View
 def otp_verify_view(request):
-    if request.user.is_authenticated:
-        return redirect('Authentication:login_user') 
-
-    context = {}
-
     if request.method == 'POST':
-        email = request.session.get('email')
-        entered_otp = request.POST.get('otp')
+        email = request.POST.get('email')  # Retrieve email from form
+        otp = request.POST.get('otp')      # Retrieve entered OTP
 
-        if not email:
-            context['error'] = 'Session expired. Please try signing up again.'
-            return render(request, 'user/otp_verify.html', context)
+        print(f"Submitted email: {email}")
 
-        try:
-            # Validate OTP
-            otp_entry = OTPVerification.objects.filter(email=email, otp=entered_otp).first()
-            if not otp_entry:
-                context['error'] = 'Invalid OTP.'
-                return render(request, 'user/otp_verify.html', context)
+        user = User.objects.filter(email__iexact=email).first()
 
-            if not otp_entry.is_valid():
-                context['error'] = 'OTP has expired.'
-                return render(request, 'user/otp_verify.html', context)
+        if not user:
+            messages.error(request, 'User not found. Please check the email.')
+            return redirect('Authentication:otp_verify')
 
-            # Create user and log in
-            user = CustomUser.objects.create_user(
-                username=request.session['username'],
-                email=email,
-                password=request.session['password']
-            )
-            login(request, user)
+        print(f"Stored OTP: {user.otp}, Entered OTP: {otp}")
+        print(f"OTP Expiry: {user.otp_expiry}, Current Time: {timezone.now()}")
 
-            # Clean up session and OTP record
-            request.session.flush()
-            otp_entry.delete()
+        if user.otp == otp and user.otp_expiry > timezone.now():
+            user.is_active = True
+            user.otp = None  # Clear OTP after successful verification
+            user.save()
+            messages.success(request, 'Account verified successfully.')
+            return redirect('Authentication:login_user')
+        else:
+            messages.error(request, 'Invalid or expired OTP.')
+            return redirect('Authentication:otp_verify')
 
-            # Redirect to the login page after successful OTP verification
-            return redirect('login_user')  # Adjust the URL name if needed
-
-        except Exception as e:
-            context['error'] = f'An error occurred: {e}'
-            return render(request, 'user/otp_verify.html', context)
-
-    return render(request, 'user/otp_verify.html', context)
+    return render(request, 'user/otp_verify.html')
 
 
-#login_view
+
+
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.views.decorators.cache import never_cache
+import re
+
 @never_cache
 def login_user(request):
     if request.user.is_authenticated:
         return redirect('Authentication:home_user')
 
     if request.method == 'POST':
-        email = request.POST.get('email')
+        username = request.POST.get('username')
         password = request.POST.get('password')
 
+        # Validation
         errors = {}
 
-        if not email:
-            errors['email'] = 'Email is required.'
+        if not username:
+            errors['username'] = 'Username is required.'
         else:
-            email = email.strip()
+            username = username.strip()
 
         if not password:
             errors['password'] = 'Password is required.'
@@ -171,10 +162,10 @@ def login_user(request):
                 messages.error(request, error_message)
             return render(request, 'user/login.html')
 
-        # Validate email format using a regex
-        email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-        if not re.match(email_pattern, email):
-            messages.error(request, 'Invalid email format.')
+        # Validate username format (optional)
+        username_pattern = r"^[a-zA-Z0-9_]+$"  # Alphanumeric and underscores only
+        if not re.match(username_pattern, username):
+            messages.error(request, 'Invalid username format.')
             return render(request, 'user/login.html')
 
         # Validate password length
@@ -182,31 +173,19 @@ def login_user(request):
             messages.error(request, 'Password must be at least 6 characters long.')
             return render(request, 'user/login.html')
 
-        try:
-            # Check if the user exists
-            user = CustomUser.objects.get(email=email)
-
-            # Check if the account is active
-            if not user.is_active:
-                messages.error(request, 'Your account is blocked.')
-                return render(request, 'user/login.html')
-
-            authenticated_user = authenticate(request, username=user.username, password=password)
-
-            if authenticated_user is not None:
-                login(request, authenticated_user)
-
-                return redirect('Authentication:home_user')
-
+        # Authenticate user
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                return redirect('products:product_list')
             else:
-                messages.error(request, 'Invalid password')
-                return render(request, 'user/login.html')
-
-        except CustomUser.DoesNotExist:
-            messages.error(request, 'User does not exist')
-            return render(request, 'user/login.html')
+                messages.error(request, 'Your account is inactive. Please contact support.')
+        else:
+            messages.error(request, 'Invalid username or password.')
 
     return render(request, 'user/login.html')
+
 
 # logout_view
 @never_cache

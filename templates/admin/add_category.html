@@ -131,28 +131,33 @@ footer {
 }
 
 </style>
-    <div class="container">
-        <h1>Add Category</h1>
+<div class="container">
+    <h1>Add Category</h1>
+    
+    <!-- Display Error Message -->
+    {% if error_message %}
+        <p style="color: red;">{{ error_message }}</p>
+    {% endif %}
+    
+    <!-- Add Category Form -->
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
         
-        <!-- Display Error Message -->
-        {% if error_message %}
-            <p style="color: red;">{{ error_message }}</p>
-        {% endif %}
-        
-        <!-- Add Category Form -->
-        <form method="POST">
-            {% csrf_token %}
-            
-            <!-- Category Name Input -->
-            <label for="category">Category Name:</label>
-            <input type="text" name="category" id="category" placeholder="Enter category name" required>
+        <!-- Category Name Input -->
+        <label for="category">Category Name:</label>
+        <input type="text" name="category" id="category" placeholder="Enter category name" required>
 
-            <!-- Description Input -->
-            <label for="description">Description:</label>
-            <textarea id="description" name="description" rows="3" placeholder="Enter description"></textarea>
-            
-            <button type="submit">Add Category</button>
-        </form>
-    </div>
+        <!-- Description Input -->
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" rows="3" placeholder="Enter description"></textarea>
+        
+        <!-- Image Upload -->
+        <label for="image">Category Image:</label>
+        <input type="file" name="image" id="image" accept="image/*">
+
+        <button type="submit">Add Category</button>
+    </form>
+</div>
+
 {% endblock %}
 

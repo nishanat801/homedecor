@@ -13,10 +13,17 @@ def add_category(request):
         # Retrieve form data
         category_name = request.POST.get('category')
         description = request.POST.get('description')
+        category_image = request.FILES.get('image')  # Get the uploaded image
 
         # Save the new category
         if category_name:
-            Category.objects.create(name=category_name, is_active=True)
+            # Create a new category with image
+            Category.objects.create(
+                name=category_name,
+                description=description,
+                image=category_image,
+                is_active=True
+            )
             print(f"Category '{category_name}' added with description: {description}")
             return redirect('category_list')  # Adjust the redirect URL as needed
         else:

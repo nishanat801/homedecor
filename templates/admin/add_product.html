@@ -77,8 +77,19 @@ h1 {
         <label for="description">Description</label>
         <textarea id="description" name="description" rows="3"></textarea>
 
-        <label for="image">Image</label>
-        <input type="file" multiple id="image" name="image">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="image1">Image 1</label>
+            <input type="file" id="image1" name="image1">
+        
+            <label for="image2">Image 2</label>
+            <input type="file" id="image2" name="image2">
+        
+            <label for="image3">Image 3</label>
+            <input type="file" id="image3" name="image3">       
+
+        {% comment %} <label for="image">Image</label>
+        <input type="file" multiple id="image" name="image"> {% endcomment %}
 
         <button type="submit">Add Product</button>
     </form>
