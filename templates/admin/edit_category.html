@@ -147,6 +147,18 @@ footer {
         <label for="description">Description:</label>
         <textarea id="description" name="description" rows="3">{{ category.description }}</textarea>
 
+        <!-- Sub category -->
+        <label for="sub-category">Sub Category</label>
+        <select id="sub-category" name="sub-category" required>
+            <option value="" disabled selected>Select a Sub category</option>
+            {% for subcategory in subcategories %}
+                <option value="{{ subcategory.id }}">{{ subcategory.name }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="image">Image</label>
+        <input type="file" id="image" name="image">
+
         <button type="submit">Save Changes</button>
     </form>
 {% endblock %}

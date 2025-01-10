@@ -18,8 +18,8 @@ def add_product(request):
         price = request.POST['price']
         stock = request.POST['stock']
         description = request.POST['description']
-        brand = request.POST.get('brand', '')
-        colors = request.POST.getlist('colors')
+        # brand = request.POST.get('brand', '')
+        # colors = request.POST.getlist('colors')
 
         try:
             # Validate and fetch the category
@@ -34,8 +34,8 @@ def add_product(request):
             price=price,
             stock=stock,
             description=description,
-            brand=brand,
-            available_colors=colors
+            # brand=brand,
+            # available_colors=colors
         )
 
         # Handle uploaded images
@@ -65,8 +65,8 @@ def edit_product(request, product_id):
         product.price = request.POST['price']
         product.stock = request.POST['stock']
         product.description = request.POST['description']
-        product.brand = request.POST.get('brand', '')
-        product.available_colors = request.POST.getlist('colors')
+        # product.brand = request.POST.get('brand', '')
+        # product.available_colors = request.POST.getlist('colors')
 
         for i in range(1, 4):
             image = request.FILES.get(f'image{i}')

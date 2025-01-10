@@ -63,7 +63,15 @@
     }
     
     a.btn-add {
-        background-color: #2196F3;
+        display: block;
+        margin: 20px auto;
+        padding: 10px 20px;
+        background-color: #28a745;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: center;
+        width:100px
     }
     
     a.btn-add:hover {
@@ -73,9 +81,15 @@
         max-width: 100px;
         border-radius: 50%;
         object-fit: cover;
+    }
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
       }
 </style>
 <h1>Product List</h1>
+{% comment %} <button class="add-product-btn" onclick="window.location.href='{% url 'add_product' %}'">Add Products</button> {% endcomment %}
+<a href="{% url 'products:add_product' %}" class="btn btn-add">Add</a>
 <table class="product-table">
     <thead>
         <tr>
@@ -104,7 +118,7 @@
             <td>
                 <a href="{% url 'products:edit_product' product.id %}" class="btn btn-edit">Edit</a>
                 <a href="{% url 'products:delete_product' product.id %}" class="btn btn-delete">Delete</a>
-                <a href="{% url 'products:add_product' %}" class="btn btn-add">Add</a>
+                {% comment %} <a href="{% url 'products:add_product' %}" class="btn btn-add">Add</a> {% endcomment %}
             </td>
         </tr>
         {% endfor %}

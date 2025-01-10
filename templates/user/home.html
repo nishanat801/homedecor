@@ -52,6 +52,32 @@
       background: #444;
       border-radius: 5px;
     }
+    /* Button styling */
+.button {
+    background-color: orange;
+    width: 300px;
+    display: inline-block;
+    text-align: center;
+    padding: 10px;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: all 0.3s ease-in-out; /* Smooth transition */
+}
+
+/* Hover effect */
+.button:hover {
+    background-color:rgb(193, 193, 24);  
+    transform: scale(1.1); 
+}
+
+    /* Active effect (clicking bulge effect) */
+.button:active {
+    transform: scale(0.95); 
+    background-color: #e67300;  
+}
+
 
     /* Hero Section */
     .hero {
@@ -277,57 +303,39 @@
     <div>
       {% comment %} <input type="text" placeholder="Search Furniture">
       <button>Search</button> {% endcomment %}
-      <a href="{% url 'login' %}" class="button" style="background-color: orange; width: 300px; display: inline-block; text-align: center; padding: 10px; color: white; text-decoration: none;">Login First</a>
+      <a href="{% url 'products:products_user' %}" class="button" style="background-color: orange; width: 300px; display: inline-block; text-align: center; padding: 10px; color: white; text-decoration: none; border-radius: 5px; transition: all 0.3s ease-in-out;">
+        Start Shopping
+    </a>
 
     </form>
     </div>
   </section>
 
   <!-- Why Choosing Us -->
-  <section class="why">
-    <h2>Our Popular Products</h2>
-    <div class="why-cards">
-      <div class="why-card"<div class="why-card" style="background: url('{% static 'images/home_model_chair.png' %}') no-repeat center/cover;"> >
-        <h3>Modern Sofa</h3>
-        {% comment %} <p>The advantage of hiring experts to create stylish furniture for your home.</p> {% endcomment %}
-      </div>
-      <div class="why-card"<div class="why-card" style="background: url('{% static 'images/home_met_3.jpg' %}') no-repeat center/cover;">>
-        <h3>Dining Table</h3>
-        {% comment %} <p>We ensure high-quality furniture at affordable prices.</p> {% endcomment %}
-      </div>
-      <div class="why-card" <div class="why-card" style="background: url('{% static 'images/home_chair_1.png' %}') no-repeat center/cover;">>
-        <h3>Single Chair</h3>
-        {% comment %} <p>Explore various styles that fit your living space.</p> {% endcomment %}
-      </div>
-      <div class="why-card" <div class="why-card" style="background: url('{% static 'images/home_chair_4.png' %}') no-repeat center/cover;">>
-        <h3>Moder chair</h3>
-        {% comment %} <p>Explore various styles that fit your living space.</p> {% endcomment %}
-      </div>
-    </div>
-  </section>
+  <section class="products">
+    <h2>Our popular Products</h2>
+    <div class="product-list">
+        {% for product in products %}
+        <div class="product">
+            <img src="{{ product.image1.url }}" alt="{{ product.name }}">
+            <h3>{{ product.name }}</h3>
+            <p class="price">₹{{ product.price }}</p>
+            <p>{{ product.description }}</p>
+        </div>
+        {% endfor %}
 
   <!-- Best Selling Products -->
   <section class="products">
     <h2>Best Selling Products</h2>
     <div class="product-list">
-      <div class="product">
-        <img src="{% static 'images/home_chair_2.png' %}" alt="Home Image">
-        <h3>Stylish Chair</h3>
-        <p class="price">₹1999</p>
-      </div>
-      <div class="product">
-        <img src="{% static 'images/home_chair_4.png' %}" alt="Home Image">
-        <h3>Modern Chair</h3>
-        <p class="price">₹2499</p>
-      </div>
-      <div class="product">
-        <img src="{% static 'images/home_sofa_1.jpg' %}" alt="Home Image">
-        <h3>Modern Sofa</h3>
-        <p class="price">₹2499</p>
-        
-      </div>
-    </div>
-  </section>
+        {% for product in products %}
+        <div class="product">
+            <img src="{{ product.image1.url }}" alt="{{ product.name }}">
+            <h3>{{ product.name }}</h3>
+            <p class="price">₹{{ product.price }}</p>
+            <p>{{ product.description }}</p>
+        </div>
+        {% endfor %}
 
   <!-- Testimonials -->
   <section class="testimonials">

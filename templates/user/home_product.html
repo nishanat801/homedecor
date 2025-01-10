@@ -1,8 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends 'header_footer.html' %}
+
+{% block content %}
     <title>Categories and Products</title>
     <style>
         body {
@@ -21,6 +19,57 @@
             border-bottom: 1px solid #ddd;
             overflow-x: auto;
         }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #f8f8f8;
+            border-bottom: 1px solid #ddd;
+        }
+
+        header nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #333;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #f8f8f8;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo .icons {
+            margin-left: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .logo .icons a {
+            text-decoration: none;
+            color: #333;
+            font-size: 1.2em;
+        }
+        
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        nav a:hover {
+            color: #007bff;
+        }
+
+        
 
         .category {
             text-align: center;
@@ -51,26 +100,38 @@
 
         /* Product grid */
         .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            display: flex;
+            flex-wrap: wrap;
             gap: 20px;
-            padding: 20px;
+            padding: 30px;
+            
         }
-
+        
         .product {
+            width: 200px; /* Adjust as needed */
             border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
+            border-radius: 5px;
+            padding: 20px;
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            transition: transform 0.3s ease;
         }
-
+        
+        .product a {
+            text-decoration: none;
+            color: inherit;
+            display: block; /* Ensure the link wraps the entire product block */
+        }
+        
         .product img {
-            width: 400px;
-            height:400pxpx;
-            object-fit: cover;
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
         }
-
+        
+        .product:hover {
+            transform: scale(1.3); /* Add a hover effect */
+        }
         .product h3 {
             margin: 10px 0;
             font-size: 1.2em;
@@ -81,6 +142,11 @@
             color: #555;
             margin: 5px 0;
         }
+        .product a {
+            text-decoration: none;
+            color: inherit;
+            display: block; 
+        }
 
         .product .price {
             font-weight: bold;
@@ -88,6 +154,7 @@
             margin: 10px 0;
         }
     </style>
+
 </head>
 <body>
     <!-- Header with categories -->
@@ -110,6 +177,7 @@
     <div class="product-grid">
         {% for product in products %}
             <div class="product">
+                <a href="{% url 'product_details' product.id %}" style="text-decoration: none; color: inherit;">
                 {% if product.image1 %}
                 <img src="{{ product.image1.url }}" alt="{{ product.name }}">
                 <h3>{{ product.name }}</h3>
@@ -128,4 +196,4 @@
         {% endfor %}
     </div>
 </body>
-</html>
+{% endblock %}

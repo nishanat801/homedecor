@@ -64,24 +64,7 @@ def signup_view(request):
                 user.save()
 
                 return redirect('Authentication:otp_verify')
-                # Save OTP in the database
-                #OTPVerification.objects.create(email=form.cleaned_data['email'], otp=otp, expires_at=otp_expiry)
-
-                # Send OTP email
-                # if send_otp_email(form.cleaned_data['email'], otp):
-                #     request.session['email'] = form.cleaned_data['email']
-                #     request.session['username'] = form.cleaned_data['username']
-                #     request.session['password'] = form.cleaned_data['password1']
-
-                #     messages.success(request, 'Account created successfully. Please check your email for the OTP.')
-                #     print(otp)
-                #     return redirect('otp_verify')
-
-                # else:
-                #     user.delete()  
-                #     messages.error(request, 'Failed to send OTP. Please try again later.')
-                #     return redirect('Authentication:signup_user') 
-
+                
             except Exception as e:
                 messages.error(request, 'An error occurred during registration. Please try again later.')
         
@@ -126,14 +109,6 @@ def otp_verify_view(request):
 
     return render(request, 'user/otp_verify.html')
 
-
-
-
-from django.contrib.auth import authenticate, login
-from django.contrib import messages
-from django.shortcuts import render, redirect
-from django.views.decorators.cache import never_cache
-import re
 
 @never_cache
 def login_user(request):

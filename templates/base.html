@@ -178,13 +178,13 @@
             <div class="container">
                 <a href="{% url 'home' %}" class="logo">HomeDecor</a>
                 <ul class="nav-links">
-                    <li><a href="#">Products</a></li>
-                    <li><a href="#">Category</a></li>
-                    <li><a href="#">Contact</a></li>
+                    <li><a href="{% url 'products:product_list' %}">Products</a></li>
+                    <li><a href="{% url 'category_list' %}">Category</a></li>
+                    <li><a href="{% url 'user:user_profile_list'%}">User Profile</a></li>
                     {% if user.is_authenticated %}
                         <li><a href="#">Logout</a></li>
                     {% else %}
-                        <li><a href="{% url 'login' %}">Login</a></li>
+                        <li><a href="{% url 'login' %}">Logout</a></li>
                     {% endif %}
                 </ul>
             </div>

@@ -151,6 +151,15 @@ footer {
         <label for="description">Description:</label>
         <textarea id="description" name="description" rows="3" placeholder="Enter description"></textarea>
         
+        <!-- Sub category -->
+        <label for="sub-category">Sub Category</label>
+        <select id="sub-category" name="sub-category" required>
+            <option value="" disabled selected>Select a Sub category</option>
+            {% for subcategory in subcategories %}
+                <option value="{{ subcategory.id }}">{{ subcategory.name }}</option>
+            {% endfor %}
+        </select>
+
         <!-- Image Upload -->
         <label for="image">Category Image:</label>
         <input type="file" name="image" id="image" accept="image/*">

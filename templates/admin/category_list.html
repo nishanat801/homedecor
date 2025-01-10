@@ -1,133 +1,107 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Category List</title>
-  <style>
-    /* General Reset */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+{% extends "base.html" %}
 
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-      color: #333;
-    }
+{% block title %}Category List{% endblock %}
 
-    .container {
-      padding: 20px;
-    }
+{% block content %}
+<div class="container">
+    <h1 style="text-align: center; margin-bottom: 20px;">Category List</h1>
 
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+    <!-- Add Category Button -->
+    <button class="add-category-btn" onclick="window.location.href='{% url 'add_category' %}'">Add Category</button>
 
+    <!-- Table -->
+    <table>
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Name</th>
+                {% comment %} <th>Sub category</th> {% endcomment %}
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in categories %}
+                <tr>
+                    <td>
+                        {% if category.image %}
+                            <img src="{{ category.image.url }}" alt="{{ category.name }}">
+                        {% else %}
+                            <span>No Image</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ category.name }}</td>
+                    <td>{{ category.description }}</td>
+                    <td>
+                        <a href="{% url 'edit_category' category.id %}" class="btn btn-edit">Edit</a>
+                        <form action="{% url 'delete_category' category.id %}" method="POST" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">No categories available.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Internal CSS -->
+<style>
     /* Table Styling */
     table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
     }
 
     th, td {
-      padding: 12px;
-      text-align: center;
-      border: 1px solid #ddd;
+        padding: 12px;
+        text-align: center;
+        border: 1px solid #ddd;
     }
 
     th {
-      background-color: #f5f5f5;
+        background-color: #f5f5f5;
     }
 
     td img {
-      max-width: 100px;
-      border-radius: 50%;
-      object-fit: cover;
+        max-width: 100px;
+        border-radius: 50%;
+        object-fit: cover;
     }
 
     .btn {
-      padding: 5px 10px;
-      border: none;
-      cursor: pointer;
-      border-radius: 5px;
+        padding: 5px 10px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
     }
 
     .btn-edit {
-      background-color: #007bff;
-      color: white;
+        background-color: #007bff;
+        color: white;
     }
 
     .btn-delete {
-      background-color: #dc3545;
-      color: white;
+        background-color: #dc3545;
+        color: white;
     }
 
     .add-category-btn {
-      display: block;
-      margin: 20px auto;
-      padding: 10px 20px;
-      background-color: #28a745;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-      text-align: center;
+        display: block;
+        margin: 20px auto;
+        padding: 10px 20px;
+        background-color: #28a745;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: center;
     }
-  </style>
-</head>
-<body>
+</style>
+{% endblock %}
 
-  <div class="container">
-    <h1>Category List</h1>
-    
-    <button class="add-category-btn" onclick="window.location.href='{% url 'add_category' %}'">Add Category</button>
-    
-    <!-- Category Table -->
-    <table>
-      <thead>
-        <tr>
-          <th>Image</th>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for category in categories %}
-          <tr>
-            <td>
-              {% if category.image %}
-                <img src="{{ category.image.url }}" alt="{{ category.name }}">
-              {% else %}
-                <span>No Image</span>
-              {% endif %}
-            </td>
-            <td>{{ category.name }}</td>
-            <td>{{ category.description }}</td>
-            <td>
-              <a href="{% url 'edit_category' category.id %}">
-                <button class="btn btn-edit">Edit</button>
-              </a>
-              <form action="{% url 'delete_category' category.id %}" method="POST" style="display: inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-delete">Delete</button>
-              </form>
-            </td>
-          </tr>
-        {% empty %}
-          <tr>
-            <td colspan="4">No categories available.</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-
-</body>
-</html>
 
