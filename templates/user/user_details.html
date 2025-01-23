@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f8f9fa;
+    }
+    
+    .checkout-container {
+        display: flex;
+        max-width: 1200px;
+        margin: 50px auto;
+        gap: 30px;
+        padding: 20px;
+    }
+    
+    .order-summary {
+        width: 25%;
+        background-color: #333;
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+    
+    .order-summary h2 {
+        margin-bottom: 10px;
+        font-size: 18px;
+    }
+    
+    .order-summary h3 {
+        font-size: 22px;
+        margin: 20px 0;
+    }
+    
+    .user-details {
+        width: 70%;
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .user-details h1 {
+        font-size: 24px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    
+    .user-details p {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #555;
+    }
+    
+    .input-group {
+        margin-bottom: 20px;
+    }
+    
+    .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    
+    .phone-input {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .phone-input span {
+        background-color: #eee;
+        padding: 10px;
+        border-radius: 5px;
+    }
+    
+    input[type="tel"], input[type="email"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+    
+    .continue-btn {
+        display: block;
+        width: 100%;
+        padding: 15px;
+        background-color: black;
+        color: white;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    
+    .continue-btn:hover {
+        background-color: #444;
+    }
+</style>
+<body>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>User Details</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <div class="checkout-container">
+            <!-- Order Summary Section -->
+            <aside class="order-summary">
+                <h2>Order Summary</h2>
+                <p>Subtotal ({{ cart_items.count }} items): ₹{{ subtotal }}</p>
+                <p>Saving: ₹{{ savings }}</p>
+                <p>Tax collected: ₹{{ tax }}</p>
+                <p>Shipping: Calculated at checkout</p>
+                <hr>
+                <p><strong>Estimated total: ₹{{ estimated_total }}</strong></p>
+            </aside>
+    ``
+            <!-- User Details Form -->
+            <main class="user-details">
+                <h1>Contact Details</h1>
+                <p>Enter mobile & email to continue</p>
+    
+                <form action="{% url 'user:user_details' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <label for="phone">Phone Number</label>
+                        <div class="phone-input">
+                            <span>+91</span>
+                            <input type="tel" id="phone" name="phone" required 
+                                   placeholder="Enter your phone number" value="{{ user_details.phone|default:'' }}">
+                        </div>
+                    </div>
+    
+                    <div class="input-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required 
+                               placeholder="Enter your email" value="{{ user_details.email|default:''}}">
+                    </div>
+                    <form action="{% url 'user:user_address'  %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="continue-btn">Continue</button>
+                    </form>
+                    
+                </form>
+            </main>
+        </div>
+</body>
+</html>

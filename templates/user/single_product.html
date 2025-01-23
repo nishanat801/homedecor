@@ -1,7 +1,35 @@
 {% extends 'header_footer.html' %}
 
 {% block content %}
+
+    
     <style>
+        .thumbnail-images {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            cursor: pointer;
+            object-fit: cover;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            transition: transform 0.3s;
+        }
+        
+        .thumbnail:hover {
+            transform: scale(1.1);
+            border-color: #000;
+        }
+        
+        .main-image {
+            width: 100%;
+            height: auto;
+        }
+        
         {% comment %} body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
@@ -221,15 +249,33 @@
                     ⭐⭐⭐⭐⭐ <span>(4.6/5, 556 reviews)</span>
                 </div>
                 <p class="description">{{ product.description }}</p>
+                <ul style="list-style-type: none; padding-left: 0;">
+                    {% for attribute in product.attributes.all %}
+                        <li>
+                            <strong>{{ attribute.attribute_type }}:</strong> {{ attribute.value }}
+                        </li><br>
+                    {% endfor %}
+                </ul>
                 <p class="description">Stock :{{ product.stock }}</p>
         
                 <div class="quantity-add">
-                    <button class="quantity-btn">-</button>
-                    <span class="quantity">1</span>
-                    <button class="quantity-btn">+</button>
-                    <button class="add-to-cart">Add to Cart</button>
-                  </div>
-                  <a href="#" class="wishlist-link">Add to Wishlist</a>
+                    <!-- Decrement Button -->
+                    <button class="quantity-btn" data-action="decrement" data-product-id="{{ product.id }}">-</button>
+                    
+                    <!-- Display Quantity -->
+                    <span class="quantity" id="quantity-{{ product.id }}">{{ cart_item.quantity|default:1 }}</span>
+                    
+                    <!-- Increment Button -->
+                    <button class="quantity-btn" data-action="increment" data-product-id="{{ product.id }}">+</button>
+                </div>
+                
+                    <!-- Add to Cart Button -->
+                    <form action="{% url 'add_to_cart' product.id %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="add-to-cart">Add to Cart</button>
+                    </form><br><br>
+            
+                    <a href="{% url 'add_to_wishlist' product.id %}" class="add-to-wishlist">Add to Wishlist</a>
             </div>
 
             {% comment %} <div class="product-images">
@@ -238,19 +284,55 @@
                 {% endif %}
             </div> {% endcomment %}
             <section class="product-images">
-                <img src="{{ product.image1.url }}" alt="{{ product.name }}" class="main-image">
+                <div id="carouselExample" class="carousel slide">
+                    <!-- Main Image -->
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="{{ product.image1.url }}" alt="{{ product.name }}" class="main-image d-block w-100" id="main-image">
+                        </div>
+                        {% if product.image2 %}
+                            <div class="carousel-item">
+                                <img src="{{ product.image2.url }}" alt="{{ product.name }} View 2" class="d-block w-100">
+                            </div>
+                        {% endif %}
+                        {% if product.image3 %}
+                            <div class="carousel-item">
+                                <img src="{{ product.image3.url }}" alt="{{ product.name }} View 3" class="d-block w-100">
+                            </div>
+                        {% endif %}
+                        {% if product.image4 %}
+                            <div class="carousel-item">
+                                <img src="{{ product.image4.url }}" alt="{{ product.name }} Dimensions" class="d-block w-100">
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Carousel Controls -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            
+                <!-- Thumbnail Images -->
                 <div class="thumbnail-images">
                     {% if product.image2 %}
-                        <img src="{{ product.image2.url }}" alt="{{ product.name }} View 2">
+                        <img src="{{ product.image2.url }}" alt="{{ product.name }} View 2" class="thumbnail" onclick="changeMainImage('{{ product.image2.url }}')">
                     {% endif %}
                     {% if product.image3 %}
-                        <img src="{{ product.image3.url }}" alt="{{ product.name }} View 3">
+                        <img src="{{ product.image3.url }}" alt="{{ product.name }} View 3" class="thumbnail" onclick="changeMainImage('{{ product.image3.url }}')">
                     {% endif %}
                     {% if product.image4 %}
-                        <img src="{{ product.image4.url }}" alt="{{ product.name }} Dimensions">
+                        <img src="{{ product.image4.url }}" alt="{{ product.name }} Dimensions" class="thumbnail" onclick="changeMainImage('{{ product.image4.url }}')">
                     {% endif %}
                 </div>
             </section>
+
+            
         </div>
 
 
@@ -287,6 +369,58 @@
             </div>
         </section>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const buttons = document.querySelectorAll('.quantity-btn');
+    
+            buttons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const productId = this.getAttribute('data-product-id');
+                    const action = this.getAttribute('data-action');
+                    const quantitySpan = document.getElementById(`quantity-${productId}`);
+                    
+                    // Send AJAX request to update quantity
+                    fetch(`/cart/update/${productId}/${action}/`, {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Update the displayed quantity
+                        quantitySpan.textContent = data.quantity;
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            });
+        });
+    </script>
+
+    <script>
+        function changeMainImage(imageUrl) {
+            // Change the main image
+            const mainImage = document.getElementById('main-image');
+            mainImage.src = imageUrl;
+            
+            // Optionally, you can update the carousel to show the correct image.
+            // This assumes that the carousel slides match the images.
+            const carousel = new bootstrap.Carousel(document.getElementById('carouselExample'));
+            carousel.to(findCarouselIndex(imageUrl));
+        }
+    
+        function findCarouselIndex(imageUrl) {
+            const images = document.querySelectorAll('.carousel-item img');
+            for (let i = 0; i < images.length; i++) {
+                if (images[i].src === imageUrl) {
+                    return i;
+                }
+            }
+            return 0;  // Default to the first image if not found
+        }
+    </script>
+    
 </body>
 {% endblock %}
 

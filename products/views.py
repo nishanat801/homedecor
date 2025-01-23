@@ -3,11 +3,11 @@ from django.http import JsonResponse
 from .models import Product
 from category.models import Category
 from random import sample
-from django.contrib.auth.decorators import user_passes_test
+from .models import ProductAttribute
 
 # @user_passes_test(lambda user: user.is_superuser)
 def product_list(request):
-    products = Product.objects.all()
+    products = Product.objects.filter(is_active=True)
     return render(request, 'admin/product_list.html', {'products': products})
 # add product
 def add_product(request):
@@ -47,6 +47,14 @@ def add_product(request):
         product.save()
          
         print("Product added, redirecting to product list...")
+        # Add attributes
+        colors = request.POST.getlist('colors')  # Expecting a list of colors
+        materials = request.POST.getlist('materials')  # Expecting a list of materials
+        
+        for color in colors:
+            ProductAttribute.objects.create(product=product, attribute_type='color', value=color)
+        for material in materials:
+            ProductAttribute.objects.create(product=product, attribute_type='material', value=material)
 
         return redirect('products:product_list')
 
@@ -98,7 +106,7 @@ def category_with_products(request, category_id=None):
         products = selected_category.products.filter(is_active=True)
     else:  # Load random products on the first page
         all_products = Product.objects.filter(is_active=True)
-        products = sample(list(all_products), min(len(all_products), 6))  # Display up to 6 random products
+        products = sample(list(all_products), min(len(all_products), 15))  # Display up to 6 random products
 
     return render(request, 'user/home_product.html', {
         'categories': categories,

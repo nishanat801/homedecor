@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <style>
+    /* General Reset */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background-color:#f9f4e9;
+        color: #333;
+        line-height: 1.6;
+    }
+
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    header {
+        background-color: #d3b787;
+        padding: 10px 20px;
+    }
+
+    header .container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    header .logo {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    header .search-bar input {
+        padding: 5px;
+        width: 300px;
+        border: 1px solid #ccc;
+        border-radius: 3px 0 0 3px;
+    }
+
+    header .search-bar button {
+        padding: 5px 10px;
+        background-color: #d98383;
+        border: none;
+        border-radius: 0 3px 3px 0;
+        color: white;
+    }
+
+    header .icons a {
+        margin-left: 10px;
+        text-decoration: none;
+        font-size: 18px;
+    }
+
+    nav ul {
+        list-style: none;
+        display: flex;
+        justify-content: space-around;
+        background-color: #d3b787;
+        padding: 10px 0;
+        margin: 0;
+    }
+
+    nav ul li a {
+        text-decoration: none;
+        color: #000;
+        font-size: 16px;
+    }
+
+    footer {
+        background-color: #e3cc98;
+        padding: 20px;
+        text-align: center;
+        margin-top: auto;
+    }
+
+    footer .footer-container {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+
+    footer h3 {
+        font-size: 18px;
+    }
+
+    footer ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    footer ul li a {
+        text-decoration: none;
+        color: #000;
+    }
+
+    .account-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 1rem;
+    }
+
+    .account-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .account-header h1 {
+        font-size: 2rem;
+        color: #333;
+    }
+
+    .account-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr); /* 4 columns in a row */
+        gap: 1.5rem;
+    }
+    
+
+    .account-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        text-align: center;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .account-card h2 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        color:rgb(7, 7, 7);
+    }
+
+    .account-card p {
+        font-size: 1rem;
+        color: #555;
+        margin-bottom: 1rem;
+    }
+
+    .account-card .card-button {
+        display: inline-block;
+        text-decoration: none;
+        background: #d3b787;
+        color: #fff;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        font-size: 1rem;
+        transition: background 0.3s ease;
+    }
+
+    .account-card .card-button:hover {
+        background: #0056b3;
+    }
+
+    .account-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- Header -->
+    <header>
+      <div class="container">
+        <div class="logo">HomeDecor</div>
+        <div class="search-bar">
+          <input type="text" placeholder="What are you looking for?">
+          <button type="submit">🔍</button>
+        </div>
+        <div class="icons">
+          <a href="{% url 'wishlist' %}" class="icon">❤️</a>
+          <div class="dropdown">
+            <button class="dropdown-toggle">
+              👤 {{ user.username }}
+            </button>
+            <div class="dropdown-menu">
+              <a href="{% url 'Authentication:logout_user' %}" class="dropdown-item">Logout</a>
+              <a href="{% url 'user:my_account' %}" class="dropdown-item">My Account</a>
+            </div>
+          </div>
+          <a href="{% url 'cart' %}" class="icon">🛒</a>
+        </div>
+      </div>
+    </header>
+
+    <nav>
+    </nav>
+
+    <!-- My Account Content -->
+    <div class="account-container">
+      <header class="account-header">
+        <h1>Welcome, {{ user.username }}</h1>
+      </header>
+
+      <div class="account-grid">
+        <!-- Orders -->
+        <div class="account-card">
+          <h2>Orders</h2>
+          <p>View and manage your orders.</p>
+          <a href="#" class="card-button">Manage Orders</a>
+        </div>
+
+        <!-- Personal Info -->
+        <div class="account-card">
+          <h2>Personal Info</h2>
+          <p>Update your personal details.</p>
+          <a href="#" class="card-button">Edit Info</a>
+        </div>
+
+        <!-- Address Management -->
+        <div class="account-card">
+          <h2>Address Management</h2>
+          <p>Manage your saved addresses.</p>
+          <a href="#" class="card-button">Manage Address</a>
+        </div>
+
+        <!-- Wallets -->
+        <div class="account-card">
+          <h2>Wallets</h2>
+          <p>Check and manage your wallet balance.</p>
+          <a href="#" class="card-button">View Wallet</a>
+        </div>
+
+        <!-- Product Reviews -->
+        <div class="account-card">
+          <h2>Product Reviews</h2>
+          <p>Review your purchased products.</p>
+          <a href="#" class="card-button">View Reviews</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-container">
+        <div class="quick-links">
+          <h3>Quick Links</h3>
+          <ul>
+            <li><a href="#">Our Story</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">In the News</a></li>
+            <li><a href="#">Blogs</a></li>
+            <li><a href="#">Terms of Service</a></li>
+          </ul>
+        </div>
+        <div class="policy">
+          <h3>Policy</h3>
+          <ul>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Refund Policy</a></li>
+            <li><a href="#">Shipping Policy</a></li>
+          </ul>
+        </div>
+        <div class="follow-us">
+          <h3>Follow Us</h3>
+          <a href="#">Facebook</a> | <a href="#">Instagram</a>
+        </div>
+        <div class="contact-us">
+          <h3>Contact Us</h3>
+          <p>Email: hello@homecanvas.com</p>
+          <p>WhatsApp: +91 95917 36665</p>
+          <p>Address: No. 117, HAL 3rd Stage, Bangalore - 560075</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

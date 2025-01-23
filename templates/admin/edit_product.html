@@ -53,35 +53,63 @@ h1 {
 }
 
 </style>
-    <h1>Edit Product</h1>
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        
-        <label for="name">Product Name</label>
-        <input type="text" id="name" name="name" value="{{ product.name }}" required>
+<h1>Edit Product</h1>
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
     
-        <label for="price">Price</label>
-        <input type="number" id="price" name="price" value="{{ product.price }}" required>
-    
-        <label for="stock">Stock</label>
-        <input type="number" id="stock" name="stock" value="{{ product.stock }}" required>
-    
-        <label for="category">Category</label>
-        <select id="category" name="category">
-            <option value="" disabled>Select a category</option>
-            {% for category in categories %}
-                <option value="{{ category.id }}" {% if product.category.id == category.id %}selected{% endif %}>
-                    {{ category.name }}
-                </option>
-            {% endfor %}
-        </select>
-    
-        <label for="description">Description</label>
-        <textarea id="description" name="description" rows="3">{{ product.description }}</textarea>
-    
-        <label for="image">Image</label>
-        <input type="file" id="image" name="image">
-    
-        <button type="submit">Save Changes</button>
-    </form>
+    <label for="name">Product Name</label>
+    <input type="text" id="name" name="name" value="{{ product.name }}" required>
+
+    <label for="price">Price</label>
+    <input type="number" id="price" name="price" value="{{ product.price }}" required>
+
+    <label for="stock">Stock</label>
+    <input type="number" id="stock" name="stock" value="{{ product.stock }}" required>
+
+    <label for="category">Category</label>
+    <select id="category" name="category">
+        <option value="" disabled>Select a category</option>
+        {% for category in categories %}
+            <option value="{{ category.id }}" {% if product.category.id == category.id %}selected{% endif %}>
+                {{ category.name }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <label for="description">Description</label>
+    <textarea id="description" name="description" rows="3">{{ product.description }}</textarea>
+
+    <h3>Attributes</h3>
+
+    <!-- Display current attributes -->
+    <label>Current Colors:</label>
+    <ul>
+        {% for attribute in product.attributes.all %}
+            {% if attribute.attribute_type == 'color' %}
+                <li>{{ attribute.value }}</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+
+    <label for="colors">Add/Update Colors (comma-separated)</label>
+    <input type="text" id="colors" name="colors">
+
+    <label for="materials">Add/Update Materials (comma-separated)</label>
+    <input type="text" id="materials" name="materials">
+
+    <label for="sizes">Add/Update Sizes (comma-separated)</label>
+    <input type="text" id="sizes" name="sizes">
+
+    <label for="image1">Image 1</label>
+    <input type="file" id="image1" name="image1">
+
+    <label for="image2">Image 2</label>
+    <input type="file" id="image2" name="image2">
+
+    <label for="image3">Image 3</label>
+    <input type="file" id="image3" name="image3">
+
+    <button type="submit">Save Changes</button>
+</form>
+
 {% endblock %}

@@ -1,0 +1,105 @@
+{% extends 'header_footer.html' %}
+
+{% block content %}
+
+{% load static%}
+
+<style>
+    .wishlist-container {
+        width: 100%;
+        margin: 0 auto;
+        padding: 60px;
+        box-sizing: border-box;
+    }
+    
+    main {
+        width: 100%;
+        padding: 20px 0;
+    }
+    
+    .wishlist-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: space-between;
+    
+    .wishlist-item {
+        flex: 1 1 calc(33.333% - 20px); 
+        max-width: calc(33.333% - 20px); 
+        box-sizing: border-box;
+    }
+    .item-image img {
+        width: 400px;
+        height: auto;
+        max-height: 250px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+    
+    .item-details {
+        text-align: justify;
+        padding: 30px;
+    }
+    .wishlist-items {
+        gap: 20px; 
+    } 
+    
+    @media (max-width: 768px) {
+        .wishlist-item {
+            flex: 1 1 calc(50% - 20px);  
+            max-width: calc(50% - 20px);
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .wishlist-item {
+            flex: 1 1 100%; 
+            max-width: 100%;
+        }
+    }
+</style>
+
+<div class="wishlist-container">
+    <header>
+        <h1> My Wishlist</h1>
+       
+    </header>
+     
+    {% comment %} <section class="controls">
+        <h2>Interesting offers</h2>
+        <div class="action-buttons">
+            <button>Unselect all</button>
+            <button>Add to cart</button>
+            <button>Relocate</button>
+            <button>Remove selected</button>
+        </div>
+        <select>
+            <option>By date added</option>
+            <option>By price</option>
+            <option>By popularity</option>
+        </select>
+    </section> {% endcomment %}
+    
+    <main>
+        <div class="wishlist-items">
+            {% for item in wishlist_items %}
+            <div class="wishlist-item">
+                <div class="item-image">
+                    {% if item.product.image1 %}
+                        <img src="{{ item.product.image1.url }}" alt="{{ item.product.name }}">
+                    {% else %}
+                        <img src="{% static 'images/placeholder.png' %}" alt="No image available">
+                    {% endif %}
+                </div>
+                <div class="item-details">
+                    <h3>{{ item.product.name }}</h3>
+                    <p>{{ item.product.description }}</p>
+                    <p>Price: {{ item.product.price }}</p>
+                    <a href="{% url 'remove_from_wishlist' item.product.id %}" class="remove-item">Remove</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+</div>
+{% endblock %}

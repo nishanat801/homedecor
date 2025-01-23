@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 import datetime
 
 
@@ -38,3 +39,12 @@ class OTPVerification(models.Model):
 
     def __str__(self):
         return f"OTP for {self.email} - {self.otp}"
+    
+
+class ForgotPasswordOTPVerification(models.Model):
+    email = models.EmailField(unique=True)
+    otp = models.CharField(max_length=6)
+    expires_at = models.DateTimeField()
+
+    def is_expired(self):
+        return timezone.now() > self.expires_at

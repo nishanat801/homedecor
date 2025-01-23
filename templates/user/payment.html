@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+    .checkout-container {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 15px;
+    }
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color:  #f9f4e9;
+        
+    }
+
+    .checkout-title {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 30px;
+    }
+
+    .checkout-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+    }
+
+    .checkout-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 24px;
+        margin-bottom: 24px;
+    }
+
+    .section-heading {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .section-heading i {
+        margin-right: 10px;
+        color: #333;
+    }
+
+    .details-group {
+        margin-bottom: 16px;
+    }
+
+    .details-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .detail-value {
+        padding: 10px 0;
+        color: #4a4a4a;
+        font-size: 14px;
+        margin: 0;
+        border-bottom: 1px solid #e5e5e5;
+    }
+
+    .address-box {
+        border: 2px solid #e5e5e5;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .address-box.selected {
+        border-color: #000;
+        background-color: #f8f9fa;
+    }
+
+    .payment-option {
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .payment-option.selected {
+        border-color: #000;
+        background-color: #f8f9fa;
+    }
+
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 16px;
+    }
+
+    .order-details h4 {
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        color: #4a4a4a;
+    }
+
+    .summary-row.total {
+        font-weight: 700;
+        font-size: 18px;
+        color: #000;
+        margin-top: 15px;
+    }
+
+    .place-order-btn {
+        width: 100%;
+        background: #000;
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    .delivery-info {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666;
+        font-size: 14px;
+        margin-top: 16px;
+    }
+
+    @media (max-width: 768px) {
+        .checkout-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="checkout-container">
+        <h1 class="checkout-title">Checkout</h1>
+        
+        <form method="POST" action="{% url 'user:order_success' %}">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            
+            <div class="checkout-grid">
+                <!-- Left Column -->
+                <div class="main-content">
+                    <!-- Customer Details Section -->
+                    <div class="checkout-card">
+                        <div class="section-heading">
+                            <i class="fas fa-user"></i>
+                            Customer Details
+                        </div>
+                        
+                        <div class="customer-details-display">
+                            <div class="details-group">
+                                <label>Full Name</label>
+                                <p class="detail-value">{{ user.userdetails.full_name }}</p>
+                            </div>
+                            
+                            <div class="details-group">
+                                <label>Email</label>
+                                <p class="detail-value">{{ user.userdetails.email }}</p>
+                            </div>
+                            
+                            <div class="details-group">
+                                <label>Phone Number</label>
+                                <p class="detail-value">{{ user.userdetails.phone }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delivery Address Section -->
+                    <div class="checkout-card">
+                        <div class="section-heading">
+                            <i class="fas fa-map-marker-alt"></i>
+                            Delivery Address
+                        </div>
+                        
+                        <div class="address-box selected">
+                            <div class="address-content">
+                                <input type="radio" name="address" checked>
+                                <div class="address-details">
+                                    <p class="name">{{ user.userdetails.full_name }}</p>
+                                    <p>{{ user.userdetails.address_line_1 }}</p>
+                                    {% if user.userdetails.address_line_2 %}
+                                    <p>{{ user.userdetails.address_line_2 }}</p>
+                                    {% endif %}
+                                    {% if user.userdetails.landmark %}
+                                    <p>Landmark: {{ user.userdetails.landmark }}</p>
+                                    {% endif %}
+                                    <p>{{ user.userdetails.city }}, {{ user.userdetails.state }} {{ user.userdetails.pincode }}</p>
+                                    <p>{{ user.userdetails.phone }}</p>
+                                    <p>Address Type: {{ user.userdetails.address_type }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method Section -->
+                    <div class="checkout-card">
+                        <div class="section-heading">
+                            <i class="fas fa-credit-card"></i>
+                            Payment Method
+                        </div>
+                        
+                        <div class="payment-methods">
+                            <div class="payment-option selected">
+                                <div class="payment-content">
+                                    <input type="radio" name="payment_method" value="card" checked>
+                                    <i class="fas fa-credit-card"></i>
+                                    <div class="payment-details">
+                                        <p class="name">Credit/Debit Card</p>
+                                        <p>Pay securely with your card</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="payment-option">
+                                <div class="payment-content">
+                                    <input type="radio" name="payment_method" value="cod">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <div class="payment-details">
+                                        <p class="name">Cash on Delivery</p>
+                                        <p>Pay when you receive</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Order Summary -->
+                <div class="order-summary-section">
+                    <div class="checkout-card">
+                        <div class="section-heading">Order Summary</div>
+                        
+                        {% for item in cart_items %}
+                        <div class="order-item">
+                            <div class="order-details">
+                                <h4>{{ item.product.name }}</h4>
+                                <p class="order-quantity">Quantity: {{ item.quantity }}</p>
+                            </div>
+                            <div class="order-price">{{ item.product.price }}</div>
+                        </div>
+                        {% endfor %}
+
+                        <div class="order-summary">
+                            <div class="summary-row">
+                                <span>Subtotal</span>
+                                <span>${{ subtotal }}</span>
+                            </div>
+                            {% if savings %}
+                            <div class="summary-row">
+                                <span>Savings</span>
+                                <span>-{{ savings }}</span>
+                            </div>
+                            {% endif %}
+                            <div class="summary-row">
+                                <span>Tax</span>
+                                <span>{{ tax }}</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Total</span>
+                                <span>{{ estimated_total }}</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="place-order-btn">Place Order</button>
+
+                        <div class="delivery-info">
+                            <i class="fas fa-truck"></i>
+                            Estimated delivery: {{ user.userdetails.estimated_delivery|date:"F d, Y" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+    // Add click handlers for payment options
+    document.querySelectorAll('.payment-option').forEach(option => {
+        option.addEventListener('click', () => {
+            document.querySelectorAll('.payment-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            option.classList.add('selected');
+            option.querySelector('input[type="radio"]').checked = true;
+        });
+    });
+    </script>
+</body>
+</html>

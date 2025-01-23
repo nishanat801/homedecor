@@ -53,44 +53,53 @@ h1 {
 }
 
 </style>
-    <h1>Add Product</h1>
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        
-        <label for="name">Product Name</label>
-        <input type="text" id="name" name="name" required>
+<h1>Add Product</h1>
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <label for="name">Product Name</label>
+    <input type="text" id="name" name="name" required>
 
-        <label for="price">Price</label>
-        <input type="number" id="price" name="price" required>
+    <label for="price">Price</label>
+    <input type="number" id="price" name="price" required>
 
-        <label for="stock">Stock</label>
-        <input type="number" id="stock" name="stock" required>
+    <label for="stock">Stock</label>
+    <input type="number" id="stock" name="stock" required>
 
-        <label for="category">Category</label>
-        <select id="category" name="category" required>
-            <option value="" disabled selected>Select a category</option>
-            {% for category in categories %}
-                <option value="{{ category.id }}">{{ category.name }}</option>
-            {% endfor %}
-        </select>
+    <label for="category">Category</label>
+    <select id="category" name="category" required>
+        <option value="" disabled selected>Select a category</option>
+        {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+        {% endfor %}
+    </select>
 
-        <label for="description">Description</label>
-        <textarea id="description" name="description" rows="3"></textarea>
+    <label for="description">Description</label>
+    <textarea id="description" name="description" rows="3"></textarea>
 
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <label for="image1">Image 1</label>
-            <input type="file" id="image1" name="image1">
-        
-            <label for="image2">Image 2</label>
-            <input type="file" id="image2" name="image2">
-        
-            <label for="image3">Image 3</label>
-            <input type="file" id="image3" name="image3">       
+    <h3>Attributes</h3>
 
-        {% comment %} <label for="image">Image</label>
-        <input type="file" multiple id="image" name="image"> {% endcomment %}
+    <!-- Colors -->
+    <label for="colors">Colors (comma-separated)</label>
+    <input type="text" id="colors" name="colors">
 
-        <button type="submit">Add Product</button>
-    </form>
+    <!-- Materials -->
+    <label for="materials">Materials (comma-separated)</label>
+    <input type="text" id="materials" name="materials">
+
+    <!-- Sizes -->
+    <label for="sizes">Sizes (comma-separated)</label>
+    <input type="text" id="sizes" name="sizes">
+
+    <label for="image1">Image 1</label>
+    <input type="file" id="image1" name="image1">
+
+    <label for="image2">Image 2</label>
+    <input type="file" id="image2" name="image2">
+
+    <label for="image3">Image 3</label>
+    <input type="file" id="image3" name="image3">       
+
+    <button type="submit">Add Product</button>
+</form>
 {% endblock %}

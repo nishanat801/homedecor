@@ -16,3 +16,11 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+class ProductAttribute(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='attributes')
+    attribute_type = models.CharField(max_length=50, choices=[('color', 'Color'), ('material', 'Material'), ('size', 'Size')])
+    value = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.product.name} - {self.attribute_type}: {self.value}"

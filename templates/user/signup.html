@@ -8,26 +8,43 @@
 <h2>Sign Up</h2>
 <form method="POST" action="{% url 'Authentication:signup_user' %}">
     {% csrf_token %}
+    
     <label for="username">Username</label>
-    <input type="text" value='example' name="username" id="username" required>
+    <input type="text" name="username" id="username" placeholder="example" required>
+    {% if form.username.errors %}
+        <p style="color:red;">{{ form.username.errors.0 }}</p>
+    {% endif %}
 
     <label for="email">Email</label>
-    <input type="email" value="example@gmail.com" name="email" id="email" required>
+    <input type="email" name="email" id="email" placeholder="example@gmail.com" required>
+    {% if form.email.errors %}
+        <p style="color:red;">{{ form.email.errors.0 }}</p>
+    {% endif %}
 
     <label for="password1">Password</label>
-    <input type="password" value="Example@123#" name="password1" id="password1" required>
+    <input type="password" name="password1" id="password1" placeholder="Example@123#" required>
+    {% if form.password1.errors %}
+        <p style="color:red;">{{ form.password1.errors.0 }}</p>
+    {% endif %}
 
     <label for="password2">Confirm Password</label>
-    <input type="password" value="Example@123#" name="password2" id="password2" required>
+    <input type="password" name="password2" id="password2" placeholder="Example@123#" required>
+    {% if form.password2.errors %}
+        <p style="color:red;">{{ form.password2.errors.0 }}</p>
+    {% endif %}
+
+    <!-- Global error messages -->
     {% if messages %}
-    {% for message in messages %}
-    <p style="color:red;"> {{ message }}</p>
-    {% endfor %} 
+        {% for message in messages %}
+            <p style="color:red;">{{ message }}</p>
+        {% endfor %}
     {% endif %}
 
     <button type="submit">Sign Up</button>
 </form>
+
 <p>Already have an account? <a href="{% url 'Authentication:login_user' %}">Login</a></p>
+
 {% endblock %}
 
 

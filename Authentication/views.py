@@ -2,22 +2,22 @@ import random
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
 from .forms import CustomUserCreationForm
-from .models import OTPVerification, CustomUser
+from .models import OTPVerification, CustomUser,ForgotPasswordOTPVerification
 from django.contrib.auth import authenticate, login, logout
 from django.http import JsonResponse
 from django.utils.timezone import now
 from django.conf import settings
-from django.urls import reverse
 from django.views.decorators.cache import never_cache
 import datetime
 import re
-from django.http import JsonResponse
 import logging
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from products.views import product_list
+from home.views import home_view
 import random
 from django.utils import timezone
+from datetime import timedelta
 logger = logging.getLogger(__name__)
 
 
@@ -42,56 +42,73 @@ def send_otp_email(to_email, otp):
         logger.error(f"Failed to send OTP email: {e}")
         return False
 
-def is_valid(self):
-    return self.expires_at > timezone.now()
+# def signup_view(request):
+#     if request.user.is_authenticated:
+#         return redirect('Authentication:login_user')
 
 def signup_view(request):
     if request.user.is_authenticated:
         return redirect('Authentication:login_user')
 
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST) 
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             try:
-                # Generate OTP
                 otp = generate_otp()
-                print(otp)
-                # Create user
+                print("Generated OTP:", otp)
+
+                # Create user but don't activate until OTP verification
                 user = form.save(commit=False)
-                user.is_active = True 
+                user.is_active = False
                 user.otp = otp
                 user.otp_expiry = now() + datetime.timedelta(minutes=5)
                 user.save()
+                print("User saved:", user.email)
 
-                return redirect('Authentication:otp_verify')
-                
+                # Store email in session
+                request.session['email'] = user.email
+                request.session.save()
+                print("Session saved with email:", user.email)
+
+                # Send OTP via email
+                if send_otp_email(user.email, otp):
+                    print("OTP sent successfully.")
+                    return redirect('Authentication:otp_verify')
+                else:
+                    messages.error(request, "Failed to send OTP. Please try again.")
+                    return redirect('Authentication:signup_user')
+
             except Exception as e:
-                messages.error(request, 'An error occurred during registration. Please try again later.')
-        
+                messages.error(request, f'Error: {str(e)}')
                 return redirect('Authentication:signup_user')
 
         else:
-            # Form validation errors
+            print("Form validation failed:", form.errors)
+            messages.error(request, "Please correct the errors below.")
             return render(request, 'user/signup.html', {'form': form})
 
-
-    form = CustomUserCreationForm() 
+    form = CustomUserCreationForm()
     return render(request, 'user/signup.html', {'form': form})
 
 
 
 # OTP Verification View
 def otp_verify_view(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')  # Retrieve email from form
-        otp = request.POST.get('otp')      # Retrieve entered OTP
+    email = request.session.get('email')  # Get email from session
 
-        print(f"Submitted email: {email}")
+    if not email:
+        messages.error(request, 'Session expired. Please try again.')
+        return redirect('Authentication:signup_user')
+
+    if request.method == 'POST':
+        otp = request.POST.get('otp')  # Get entered OTP
+
+        print(f"Stored email from session: {email}")
 
         user = User.objects.filter(email__iexact=email).first()
 
         if not user:
-            messages.error(request, 'User not found. Please check the email.')
+            messages.error(request, 'User not found. Please try again.')
             return redirect('Authentication:otp_verify')
 
         print(f"Stored OTP: {user.otp}, Entered OTP: {otp}")
@@ -99,8 +116,13 @@ def otp_verify_view(request):
 
         if user.otp == otp and user.otp_expiry > timezone.now():
             user.is_active = True
-            user.otp = None  # Clear OTP after successful verification
+            user.otp = None  # Clear OTP after verification
+            user.otp_expiry = None
             user.save()
+
+            # Clear session
+            del request.session['email']
+
             messages.success(request, 'Account verified successfully.')
             return redirect('Authentication:login_user')
         else:
@@ -109,11 +131,10 @@ def otp_verify_view(request):
 
     return render(request, 'user/otp_verify.html')
 
-
 @never_cache
 def login_user(request):
     if request.user.is_authenticated:
-        return redirect('Authentication:home_user')
+        return redirect('home')  # Correct redirect without namespace
 
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -153,7 +174,7 @@ def login_user(request):
         if user is not None:
             if user.is_active:
                 login(request, user)
-                return redirect('products:product_list')
+                return redirect('home')  # Correct redirect without namespace
             else:
                 messages.error(request, 'Your account is inactive. Please contact support.')
         else:
@@ -169,52 +190,99 @@ def logout_user(request):
     logout(request)
     return redirect('Authentication:login_user')
 
+
 # Forgot Password View
 def forgot_password(request):
     if request.user.is_authenticated:
-        return redirect('Authentication:home_user')
-
+        return redirect('Authentication:login_user')
+    
     if request.method == 'POST':
         email = request.POST.get('email')
+        
         if not CustomUser.objects.filter(email=email).exists():
-            return JsonResponse({'status': 'error', 'message': 'Email does not exist.'}, status=400)
-
-        otp = generate_otp()
-        otp_expiry = now() + datetime.timedelta(minutes=5)
-
-        OTPVerification.objects.create(email=email, otp=otp, expires_at=otp_expiry)
-
+            return render(request, 'user/forgot_password.html', {
+                'error': 'Email does not exist.'
+            })
+        
+        otp = generate_otp()  # Ensure this generates a valid OTP
+        otp_expiry = timezone.now() + timedelta(minutes=5)
+        
+        # Save OTP to the database
+        otp_entry, created = ForgotPasswordOTPVerification.objects.update_or_create(
+            email=email,
+            defaults={
+                'otp': otp,
+                'expires_at': otp_expiry
+            }
+        )
+        
         if send_otp_email(email, otp):
             request.session['email'] = email
-            return JsonResponse({'status': 'success', 'redirect_url': reverse('Authentication:verify_otp')})
+            return redirect('Authentication:forgot_password_otp_verify')
         else:
-            return JsonResponse({'status': 'error', 'message': 'Failed to send OTP. Please try again.'}, status=500)
-
+            return render(request, 'user/forgot_password.html', {
+                'error': 'Failed to send OTP. Please try again.'
+            })
+    
     return render(request, 'user/forgot_password.html')
+
+# forgot-password-otp-verify
+def forgot_password_otp_verify(request):
+    email = request.session.get('email')
+    if not email:
+        return redirect('Authentication:forgot_password')
+    
+    if request.method == 'POST':
+        entered_otp = request.POST.get('otp')
+        
+        try:
+            otp_record = ForgotPasswordOTPVerification.objects.get(email=email)
+        except ForgotPasswordOTPVerification.DoesNotExist:
+            return render(request, 'user/forgot_password_otp_verify.html', 
+                          {'error': 'OTP not found.'})
+        
+        if timezone.now() > otp_record.expires_at:
+            return render(request, 'user/forgot_password_otp_verify.html', 
+                          {'error': 'OTP expired.'})
+        
+        if str(otp_record.otp) != entered_otp:
+            return render(request, 'user/forgot_password_otp_verify.html', 
+                          {'error': 'Invalid OTP.'})
+        
+        return redirect('Authentication:reset_password')
+    
+    return render(request, 'user/forgot_password_otp_verify.html')
+
 
 
 # Reset Password View
 def reset_password(request):
+    email = request.session.get('email')
+
+    if not email:
+        return redirect('Authentication:forgot_password')
+
     if request.method == 'POST':
-        email = request.session.get('email')
         new_password = request.POST.get('password1')
         confirm_password = request.POST.get('password2')
 
         if new_password != confirm_password:
-            return JsonResponse({'status': 'error', 'message': 'Passwords do not match.'}, status=400)
+            return render(request, 'user/reset_password.html', {
+                'error': 'Passwords do not match.'
+            })
 
         user = CustomUser.objects.get(email=email)
         user.set_password(new_password)
         user.save()
 
-        # Clean up session
+        # Clean session and redirect
         request.session.flush()
-        return JsonResponse({'status': 'success', 'redirect_url': reverse('Authentication:login_user')})
+        messages.success(request, 'Password reset successful. Please log in.')
+        return redirect('Authentication:login_user')
 
     return render(request, 'user/reset_password.html')
-
-#username:admin
-#email:admin@gmail.com
+#username:homedecor
+#email:homedecoradmin@gmail.com
 #password:homedecoradmin
 
 # admin login

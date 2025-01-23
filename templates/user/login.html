@@ -5,6 +5,7 @@
 {% block header_title %}Login to Home Decor{% endblock %}
 
 {% block content %}
+{% load socialaccount %}
 <h2>Login</h2>
 <form method="POST" action="{% url 'Authentication:login_user' %}">
     {% csrf_token %}
@@ -13,8 +14,16 @@
 
     <label for="password">Password</label>
     <input type="password" name="password" id="password" required>
+    {% if messages %}
+    {% for message in messages %}
+    <p style='color:red';>{{message}} </p>
+    {%endfor%}
+    {%endif%}
 
-    <button type="submit">Login</button>
+    <button type="submit">Login</button><br><br>
+    <a href="{% provider_login_url 'google' %}" class="btn btn-light w-100 mt-2 border" style="text-decoration: none;">
+        Log In with Google
+    </a>
 </form>
 <p>Don't have an account? <a href="{% url 'Authentication:signup_user' %}">Sign up</a></p>
 <p><a href="{% url 'Authentication:forgot_password' %}">Forgot Password?</a></p>

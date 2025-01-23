@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404
 
 def home_view(request):
     all_products = Product.objects.filter(is_active=True)
-    products = sample(list(all_products), min(len(all_products), 6))  # Display up to 6 random products
+    products = sample(list(all_products), min(len(all_products), 6)) 
 
     return render(request, 'user/home.html', {
         'products': products

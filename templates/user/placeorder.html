@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thank You</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Arial', sans-serif;
+        background-color: #e8f9e7;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      
+      /* Container styles */
+      .thank-you-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+      }
+      
+      /* Card styles */
+      .thank-you-card {
+        text-align: center;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 90%;
+        max-width: 600px;
+      }
+      
+      /* Heading styles */
+      .thank-you-card h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #232323;
+      }
+      
+      /* Paragraph styles */
+      .thank-you-card p {
+        font-size: 1rem;
+        color: #232323;
+        margin-bottom: 15px;
+        line-height: 1.5;
+      }
+      
+      /* Button styles */
+      .continue-button {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #232323;
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 1rem;
+        border-radius: 25px;
+        transition: background-color 0.3s ease;
+      }
+      
+      .continue-button:hover {
+        background-color: #3c3c3c;
+      }
+  </style>
+
+</head>
+<body>
+  {% comment %} <div class="thank-you-container">
+    <div class="thank-you-card">
+      <h1>Thank you for your order!</h1>
+      <p>Your order <strong></strong> has been accepted and will be processed shortly.</p>
+      <p>Expect our courier <strong>{{estimated_total}}{{'cart_products'}}</strong></p>
+      <a href="{% url 'products:products_user' %}" class="continue-button">Continue shopping</a>
+    </div>
+  </div> {% endcomment %}
+
+  <h1>Confirm Your Order</h1>
+
+  <h3>Your Cart Items:</h3>
+  <ul class="product-list">
+      {% for product in cart_products %}
+          <li>{{ product.name }} - ₹{{ product.price }}</li>
+      {% empty %}
+          <li>No items in cart.</li>
+      {% endfor %}
+  </ul>
+
+  <h3>Total Amount: ₹{{ estimated_total }}</h3>
+
+  <form method="POST" action="{% url 'user:placeorder' %}">
+      {% csrf_token %}
+      
+      <input type="hidden" name="user_id" value="{{ request.user.id }}">
+      <input type="hidden" name="address_id" value="{{ request.user.id }}">
+      
+      {% for product in cart_products %}
+          <input type="hidden" name="product_id" value="{{ order.product.id }}">
+      {% endfor %}
+
+      <button type="submit" class="order-button">Place Order</button>
+  </form>
+</body>
+</html>

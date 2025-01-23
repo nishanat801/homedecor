@@ -1,0 +1,281 @@
+{% extends 'header_footer.html' %}
+
+{% block content %}
+
+{% load static%}
+
+<style>
+    
+    header nav {
+        padding: 10px;
+        background-color: #333;
+        color: white;
+    }
+    
+    header nav a {
+        color: #fff;
+        text-decoration: none;
+        margin-right: 5px;
+    }
+    
+    h1 {
+        margin: 20px;
+        text-align: center;
+    }
+    
+    .cart {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px;
+    }
+    
+    
+
+
+    .cart-items {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 80px;
+    
+    }
+
+    .cart-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 70px;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .item-image img {
+        width: 100px;
+        height: auto;
+        border-radius: 5px;
+    }
+
+    .item-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    .item-info, .item-quantity, .item-total, .item-remove {
+        margin: 0 10px;
+        text-align: center;
+    }
+
+    .item-info h3 {
+        font-size: 1.2em;
+        margin-bottom: 5px;
+    }
+
+    .item-info p {
+        font-size: 0.9em;
+        color: #555;
+    }
+
+    .item-remove button {
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+
+    .item-remove button:hover {
+        background-color: #e60000;
+    }
+
+
+    
+    
+    .discount {
+        color: red;
+        font-weight: bold;
+    }
+    
+    .order-summary {
+        width: 30%;
+        padding: 20px;
+        background: #fff;
+        border: 1px solid #ddd;
+    }
+    
+    .order-summary h2 {
+        text-align: center;
+    }
+    
+    .order-summary p {
+        margin: 10px 0;
+    }
+    
+    .saving {
+        color: red;
+    }
+    
+    .checkout-btn {
+        width: 100%;
+        padding: 10px;
+        background: green;
+        color: white;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    
+    .promo-btn {
+        margin: 20px auto;
+        display: block;
+        padding: 10px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+    
+    button {
+        padding: 5px;
+       
+        cursor: pointer;
+    }
+    
+   
+    
+</style>
+
+<main>
+    <h1>Shopping Cart</h1>
+    <p>Buy $183 more to get Free Shipping</p>
+    <div class="cart-items">
+        {% for item in cart_items %}
+        <div class="cart-item">
+            <div class="item-image">
+                {% if item.product.image1 %}
+                    <img src="{{ item.product.image1.url }}" alt="{{ item.product.name }}">
+                {% else %}
+                    <img src="{% static 'images/placeholder.png' %}" alt="No image available">
+                {% endif %}
+            </div>
+    
+            <div class="item-content">
+                <div class="item-info">
+                    <h3>{{ item.product.name }}</h3>
+                    <p>{{ item.product.description }}</p>
+                    <p>Price: {{ item.product.price }}</p>
+                </div>
+    
+                <div class="item-quantity">
+                    <p>Quantity: {{ item.quantity }}</p>
+                </div>
+    
+                <div class="item-total">
+                    <p>Total: {{ item.total_amount }}</p>
+                </div>
+    
+                <div class="item-remove">
+                    <form action="{% url 'remove_from_cart' item.product.id %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="remove-item">Remove</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+
+        <aside class="order-summary">
+            <h2>Order Summary</h2>
+            <p>Subtotal ({{ cart_items.count }} items): ₹{{ subtotal }}</p>
+            <p>Saving: ₹{{ savings }}</p>
+            <p>Tax collected: ₹{{ tax }}</p>
+            <p>Shipping: Calculated at checkout</p>
+            <hr>
+            <p><strong>Estimated total: ₹{{ estimated_total }}</strong></p>
+            <form action="{% url 'user:user_details'  %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="checkout-btn">Proceed to Checkout</button>
+            </form>
+        </aside>
+    </div>
+
+    <button class="promo-btn">% Apply promo code</button>
+</main>
+
+{% endblock %}
+
+<script>
+    document.querySelectorAll('.increase-quantity').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const productId = e.target.getAttribute('data-id');
+            updateQuantity(productId, 1);
+        });
+    });
+
+    document.querySelectorAll('.decrease-quantity').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const productId = e.target.getAttribute('data-id');
+            updateQuantity(productId, -1);
+        });
+    });
+
+    document.querySelectorAll('.remove-item').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const productId = e.target.getAttribute('data-id');
+            removeItem(productId);
+        });
+    });
+
+    {% comment %} function updateQuantity(productId, change) {
+        const quantitySpan = document.querySelector(`#cart-item-${productId} .quantity`);
+        let quantity = parseInt(quantitySpan.innerText);
+        quantity += change;
+
+        if (quantity < 1) {
+            quantity = 1; // Prevent negative quantity
+        }
+
+        quantitySpan.innerText = quantity;
+
+        // Update total for the item
+        const price = parseFloat(document.querySelector(`#cart-item-${productId} td:nth-child(2)`).innerText);
+        const totalPrice = price * quantity;
+        document.querySelector(`#cart-item-${productId} .total-price`).innerText = totalPrice.toFixed(2);
+
+        // Update order summary
+        updateCartSummary();
+    } {% endcomment %}
+
+    function removeItem(productId) {
+        const row = document.querySelector(`#cart-item-${productId}`);
+        row.remove();
+
+        // Update order summary after item removal
+        updateCartSummary();
+    }
+
+    {% comment %} function updateCartSummary() {
+        let subtotal = 0;
+        let itemCount = 0;
+        document.querySelectorAll('.total-price').forEach(cell => {
+            subtotal += parseFloat(cell.innerText);
+            itemCount++;
+        });
+
+        // Assume you have tax and savings logic based on subtotal
+        const savings = 110.00; // Example savings
+        const tax = 73.40; // Example tax
+        const estimatedTotal = subtotal - savings + tax;
+
+        // Update the DOM elements with new values
+        document.getElementById('subtotal').innerText = subtotal.toFixed(2);
+        document.getElementById('savings').innerText = savings.toFixed(2);
+        document.getElementById('estimated-total').innerText = estimatedTotal.toFixed(2);
+    } {% endcomment %}
+
+</script>
