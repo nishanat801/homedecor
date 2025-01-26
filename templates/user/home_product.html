@@ -153,6 +153,27 @@
             color: #000;
             margin: 10px 0;
         }
+
+ 
+        
+        .filter-sort-container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            background-color: #f4f4f4;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .filter, .sort {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    
+        select {
+            padding: 5px;
+            font-size: 1em;
+        }
     </style>
 
 </head>
@@ -172,6 +193,40 @@
             </div>
         {% endfor %}
     </div>
+
+    <!-- Filter and Sort Options -->
+    <div class="filter-sort-container">
+        <div class="filter">
+            <label for="material-filter">Filter by Material:</label>
+            <select id="material-filter" onchange="filterProducts()">
+                <option value="">All</option>
+                {% for material in materials %}
+                    <option value="{{ material.id }}">{{ material.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    
+        <div class="filter">
+            <label for="color-filter">Filter by Color:</label>
+            <select id="color-filter" onchange="filterProducts()">
+                <option value="">All</option>
+                {% for color in colors %}
+                    <option value="{{ color.id }}">{{ color.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="sort">
+            <label for="sort-by">Sort by:</label>
+            <select id="sort-by" onchange="sortProducts()">
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="name-asc">Name: A to Z</option>
+                <option value="name-desc">Name: Z to A</option>
+            </select>
+        </div>
+    </div>
+    
 
     <!-- Product grid -->
     <div class="product-grid">
@@ -195,5 +250,24 @@
             <p>No products available.</p>
         {% endfor %}
     </div>
+
+    <script>
+        function filterProducts() {
+            const materialId = document.getElementById('material-filter').value;
+            const colorId = document.getElementById('color-filter').value;
+            let query = '';
+            if (materialId) query += `material=${materialId}&`;
+            if (colorId) query += `color=${colorId}`;
+            window.location.href = query ? `/?${query}` : '/';
+        }
+    
+        function sortProducts() {
+            const sortBy = document.getElementById('sort-by').value;
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('sort', sortBy);
+            window.location.search = urlParams.toString();
+        }
+    </script>
+    
 </body>
 {% endblock %}

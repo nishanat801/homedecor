@@ -156,61 +156,63 @@
         <form method="POST" action="{% url 'user:order_success' %}">
             {% csrf_token %}
             {{ form.non_field_errors }}
+            {{ form.as_p }}
             
             <div class="checkout-grid">
-                <!-- Left Column -->
                 <div class="main-content">
                     <!-- Customer Details Section -->
                     <div class="checkout-card">
                         <div class="section-heading">
-                            <i class="fas fa-user"></i>
-                            Customer Details
+                            <i class="fas fa-user"></i> Customer Details
                         </div>
-                        
                         <div class="customer-details-display">
                             <div class="details-group">
                                 <label>Full Name</label>
-                                <p class="detail-value">{{ user.userdetails.full_name }}</p>
+                                <p class="name">{{ selected_address.full_name }}</p>
                             </div>
-                            
                             <div class="details-group">
                                 <label>Email</label>
-                                <p class="detail-value">{{ user.userdetails.email }}</p>
+                                <p class="detail-value">{{ request.user.email }}</p>
                             </div>
-                            
                             <div class="details-group">
                                 <label>Phone Number</label>
-                                <p class="detail-value">{{ user.userdetails.phone }}</p>
+                                <p class="detail-value">{{ selected_address.phone_number }}</p>
                             </div>
                         </div>
-                    </div>
-
+                
+            
                     <!-- Delivery Address Section -->
                     <div class="checkout-card">
                         <div class="section-heading">
-                            <i class="fas fa-map-marker-alt"></i>
-                            Delivery Address
+                            <i class="fas fa-map-marker-alt"></i> Delivery Address
                         </div>
-                        
+            
+                        {% if selected_address %}
                         <div class="address-box selected">
                             <div class="address-content">
-                                <input type="radio" name="address" checked>
+                                <input type="radio" name="address_id" value="{{ selected_address.id }}" checked>
                                 <div class="address-details">
-                                    <p class="name">{{ user.userdetails.full_name }}</p>
-                                    <p>{{ user.userdetails.address_line_1 }}</p>
-                                    {% if user.userdetails.address_line_2 %}
-                                    <p>{{ user.userdetails.address_line_2 }}</p>
+                                    <p class="name">{{ selected_address.full_name }}</p>
+                                    <p>{{ selected_address.address }}</p>
+                                    {% if selected_address.area %}
+                                    <p>Area: {{ selected_address.area }}</p>
                                     {% endif %}
-                                    {% if user.userdetails.landmark %}
-                                    <p>Landmark: {{ user.userdetails.landmark }}</p>
+                                    {% if selected_address.landmark %}
+                                    <p>Landmark: {{ selected_address.landmark }}</p>
                                     {% endif %}
-                                    <p>{{ user.userdetails.city }}, {{ user.userdetails.state }} {{ user.userdetails.pincode }}</p>
-                                    <p>{{ user.userdetails.phone }}</p>
-                                    <p>Address Type: {{ user.userdetails.address_type }}</p>
+                                    <p>{{ selected_address.city }}, {{ selected_address.state }} - {{ selected_address.pincode }}</p>
+                                    <p>Phone: {{ selected_address.phone_number }}</p>
+                                    <p>Address Type: {{ selected_address.address_type }}</p>
                                 </div>
                             </div>
                         </div>
+                        {% else %}
+                        <p>No address selected. Please go back and <a href="{% url 'user:personal_info' %}">select an address</a>.</p>
+                        {% endif %}
                     </div>
+                </div>
+            </div>
+            
 
                     <!-- Payment Method Section -->
                     <div class="checkout-card">
@@ -263,7 +265,7 @@
                         <div class="order-summary">
                             <div class="summary-row">
                                 <span>Subtotal</span>
-                                <span>${{ subtotal }}</span>
+                                <span>{{ subtotal }}</span>
                             </div>
                             {% if savings %}
                             <div class="summary-row">
@@ -304,6 +306,16 @@
             option.querySelector('input[type="radio"]').checked = true;
         });
     });
+
+
+    
+        document.querySelectorAll('.select-address-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const addressId = this.closest('.address-card').getAttribute('data-address-id');
+                window.location.href = `/checkout/?address_id=${addressId}`;
+            });
+        });
+    
     </script>
 </body>
 </html>

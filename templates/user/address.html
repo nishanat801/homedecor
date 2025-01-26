@@ -153,11 +153,19 @@
             <!-- Form starts here -->
             <form action="{% url 'user:user_address' %}" method="POST" class="address-form">
                 {% csrf_token %}
+
+                
                 <div class="input-row">
+
                     <div class="input-group">
+                        <label for="phone-number">Phone Number</label>
+                        <input type="tel" id="phone-number" name="phone-number" placeholder="Enter your phone number" required>
+                    </div>
+
+                    {% comment %} <div class="input-group">
                         <label for="pincode">Pincode</label>
                         <input type="text" id="pincode" name="pincode" placeholder="Pincode" required>
-                    </div>
+                    </div> {% endcomment %}
         
                     <div class="input-group">
                         <label for="city">City</label>

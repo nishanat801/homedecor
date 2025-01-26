@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'category',
     'home',
     'cart',
+    'address',
 ]
 
 MIDDLEWARE = [
@@ -203,3 +204,5 @@ SOCIALACCOUNT_PROVIDERS = {
         'OAUTH_PKCE_ENABLED': True,
     }
 }
+LOGIN_REDIRECT_URL = 'http://127.0.0.1:8000/'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'

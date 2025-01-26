@@ -149,7 +149,7 @@
 
 <main>
     <h1>Shopping Cart</h1>
-    <p>Buy $183 more to get Free Shipping</p>
+    <p>Buy 183 more to get Free Shipping</p>
     <div class="cart-items">
         {% for item in cart_items %}
         <div class="cart-item">
@@ -197,7 +197,7 @@
             <p>Shipping: Calculated at checkout</p>
             <hr>
             <p><strong>Estimated total: ₹{{ estimated_total }}</strong></p>
-            <form action="{% url 'user:user_details'  %}" method="post" style="display: inline;">
+            <form action="{% url 'address:address_list'  %}" method="post" style="display: inline;">
                 {% csrf_token %}
                 <button type="submit" class="checkout-btn">Proceed to Checkout</button>
             </form>

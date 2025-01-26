@@ -4,7 +4,7 @@ from .models import Order
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = ['shipping_address']
+        fields = ['total_price', 'shipping_address']
 
     # Additional fields (not in the model) can be added manually
     payment_method = forms.ChoiceField(choices=[

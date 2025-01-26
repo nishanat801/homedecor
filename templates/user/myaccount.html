@@ -212,14 +212,14 @@
         <div class="account-card">
           <h2>Orders</h2>
           <p>View and manage your orders.</p>
-          <a href="#" class="card-button">Manage Orders</a>
+          <a href="{% url 'user: user_orders' %}" class="card-button">Manage Orders</a>
         </div>
-
+       
         <!-- Personal Info -->
         <div class="account-card">
           <h2>Personal Info</h2>
           <p>Update your personal details.</p>
-          <a href="#" class="card-button">Edit Info</a>
+          <a href="{% url 'address:address_list' %}" class="card-button">Personal Info</a>
         </div>
 
         <!-- Address Management -->
