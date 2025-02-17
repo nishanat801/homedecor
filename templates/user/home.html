@@ -314,32 +314,43 @@
     </div>
   </section>
 
-  <!-- Why Choosing Us -->
-  <section class="products">
-    <h2>Our popular Products</h2>
-    <div class="product-list">
-        {% for product in products %}
-        <div class="product">
-            <img src="{{ product.image1.url }}" alt="{{ product.name }}">
-            <h3>{{ product.name }}</h3>
-            <p class="price">₹{{ product.price }}</p>
-            <p>{{ product.description }}</p>
-        </div>
-        {% endfor %}
+ <!-- Popular Products Section -->
+<section class="products">
+  <h2>Our Popular Products</h2>
+  <div class="product-list">
+      {% for product in products %}
+      <div class="product">
+          {% if product.image1 %}
+              <img src="{{ product.image1.url }}" alt="{{ product.name }}">
+          {% else %}
+              <img src="/static/images/default-product.jpg" alt="No Image Available">
+          {% endif %}
+          <h3>{{ product.name }}</h3>
+          <p class="price">₹{{ product.price }}</p>
+          <p>{{ product.description }}</p>
+      </div>
+      {% endfor %}
+  </div>
+</section>
 
-  <!-- Best Selling Products -->
-  <section class="products">
-    <h2>Best Selling Products</h2>
-    <div class="product-list">
-        {% for product in products %}
-        <div class="product">
-            <img src="{{ product.image1.url }}" alt="{{ product.name }}">
-            <h3>{{ product.name }}</h3>
-            <p class="price">₹{{ product.price }}</p>
-            <p>{{ product.description }}</p>
-        </div>
-        {% endfor %}
-
+<!-- Best Selling Products Section -->
+<section class="products">
+  <h2>Best Selling Products</h2>
+  <div class="product-list">
+      {% for product in products %}
+      <div class="product">
+          {% if product.image1 %}
+              <img src="{{ product.image1.url }}" alt="{{ product.name }}">
+          {% else %}
+              <img src="/static/images/default-product.jpg" alt="No Image Available">
+          {% endif %}
+          <h3>{{ product.name }}</h3>
+          <p class="price">₹{{ product.price }}</p>
+          <p>{{ product.description }}</p>
+      </div>
+      {% endfor %}
+  </div>
+</section>
   <!-- Testimonials -->
   <section class="testimonials">
     <h2>Our Client Reviews</h2>

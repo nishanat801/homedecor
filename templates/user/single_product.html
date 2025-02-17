@@ -4,7 +4,7 @@
 
     
     <style>
-        .thumbnail-images {
+        {% comment %} .thumbnail-images {
             display: flex;
             gap: 10px;
             margin-top: 10px;
@@ -28,7 +28,7 @@
         .main-image {
             width: 100%;
             height: auto;
-        }
+        } {% endcomment %}
         
         {% comment %} body {
             font-family: 'Roboto', sans-serif;
@@ -236,6 +236,48 @@
             border: 1px solid #ddd;
             cursor: pointer;
         }
+
+
+
+
+
+
+
+        .zoom-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .zoom-container img {
+            max-width: 90%;
+            max-height: 90%;
+            cursor: pointer;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: auto;
+            cursor: pointer;
+            margin: 5px;
+            border: 2px solid transparent;
+        }
+
+        .thumbnail:hover {
+            border-color: #007bff;
+        }
+
+        .main-image {
+            cursor: zoom-in;
+        }
     </style>
 </head>
 <body>
@@ -243,7 +285,7 @@
         <div class="product-details">
             
             <div class="product-info">
-                <h1 class="product-title">{{product.name}}</h1>
+                <h1 class="product-title">{{ product.name }}</h1>
                 <p class="price">{{ product.price }}</p>
                 <div class="rating">
                     ⭐⭐⭐⭐⭐ <span>(4.6/5, 556 reviews)</span>
@@ -251,41 +293,27 @@
                 <p class="description">{{ product.description }}</p>
                 <ul style="list-style-type: none; padding-left: 0;">
                     {% for attribute in product.attributes.all %}
-                        <li>
-                            <strong>{{ attribute.attribute_type }}:</strong> {{ attribute.value }}
-                        </li><br>
+                        <li><strong>{{ attribute.attribute_type }}:</strong> {{ attribute.value }}</li><br>
                     {% endfor %}
                 </ul>
-                <p class="description">Stock :{{ product.stock }}</p>
+                <p class="description">Stock: {{ product.stock }}</p>
         
                 <div class="quantity-add">
-                    <!-- Decrement Button -->
                     <button class="quantity-btn" data-action="decrement" data-product-id="{{ product.id }}">-</button>
-                    
-                    <!-- Display Quantity -->
                     <span class="quantity" id="quantity-{{ product.id }}">{{ cart_item.quantity|default:1 }}</span>
-                    
-                    <!-- Increment Button -->
                     <button class="quantity-btn" data-action="increment" data-product-id="{{ product.id }}">+</button>
                 </div>
                 
-                    <!-- Add to Cart Button -->
-                    <form action="{% url 'add_to_cart' product.id %}" method="post" style="display: inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="add-to-cart">Add to Cart</button>
-                    </form><br><br>
-            
-                    <a href="{% url 'add_to_wishlist' product.id %}" class="add-to-wishlist">Add to Wishlist</a>
+                <form action="{% url 'add_to_cart' product.id %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="add-to-cart">Add to Cart</button>
+                </form><br><br>
+        
+                <a href="{% url 'add_to_wishlist' product.id %}" class="add-to-wishlist">Add to Wishlist</a>
             </div>
 
-            {% comment %} <div class="product-images">
-                {% if product.image1 %}
-                <img src="{{ product.image1.url }}" alt="{{ product.name }}">
-                {% endif %}
-            </div> {% endcomment %}
             <section class="product-images">
                 <div id="carouselExample" class="carousel slide">
-                    <!-- Main Image -->
                     <div class="carousel-inner">
                         <div class="carousel-item active">
                             <img src="{{ product.image1.url }}" alt="{{ product.name }}" class="main-image d-block w-100" id="main-image">
@@ -307,7 +335,6 @@
                         {% endif %}
                     </div>
                     
-                    <!-- Carousel Controls -->
                     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Previous</span>
@@ -318,7 +345,6 @@
                     </button>
                 </div>
             
-                <!-- Thumbnail Images -->
                 <div class="thumbnail-images">
                     {% if product.image2 %}
                         <img src="{{ product.image2.url }}" alt="{{ product.name }} View 2" class="thumbnail" onclick="changeMainImage('{{ product.image2.url }}')">
@@ -332,95 +358,173 @@
                 </div>
             </section>
 
-            
         </div>
-
 
         <section class="related-products">
             <h2>Related Products</h2>
             <div class="product-list">
-                <div class="product">
-                    {% for related_product in related_products %}
-                        <div class="product">
+                {% for related_product in related_products %}
+                    <div class="product">
                         {% if related_product.image1 %}
-                        <img src="{{ related_product.image1.url }}" alt="{{ related_product.name }}">
-                         {% endif %}
+                            <img src="{{ related_product.image1.url }}" alt="{{ related_product.name }}">
+                        {% endif %}
                         <p>{{ related_product.name }}</p>
                         <p>{{ related_product.price }}</p>
-                </div>
-                    {% endfor %}
-                </div>
+                    </div>
+                {% endfor %}
             </div>
         </section>
 
         <section class="customer-reviews">
             <h2>Customer Reviews</h2>
             <div class="reviews">
-                <div class="review">
-                    {% comment %} <p><strong>Rafael Marquez</strong> (June 25, 2024)</p>
-                    <p>Absolutely love this chair! It’s exactly what I was looking for to complete my living room.</p>
-                    <p>⭐ 5/5</p>
-                </div>
-                <div class="review"> {% endcomment %}
-                    {% comment %} <p><strong>Bessie Cooper</strong> (April 8, 2024)</p>
-                    <p>While the design is nice, I found the quality to be lacking after a few weeks.</p>
-                    <p>⭐ 2/5</p> {% endcomment %}
-                </div>
+                <!-- Reviews section can be dynamically generated here -->
             </div>
         </section>
     </div>
 
+    <!-- Image Zoom Modal -->
+    <div class="zoom-container" id="zoom-container">
+        <img id="zoomed-image" src="" alt="Zoomed Image">
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Quantity Update Logic
             const buttons = document.querySelectorAll('.quantity-btn');
-    
+            const maxStock = parseInt(document.querySelector('.description').textContent.match(/Stock: (\d+)/)[1]);
+            
             buttons.forEach(button => {
-                button.addEventListener('click', function () {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
                     const productId = this.getAttribute('data-product-id');
                     const action = this.getAttribute('data-action');
                     const quantitySpan = document.getElementById(`quantity-${productId}`);
-                    
-                    // Send AJAX request to update quantity
+                    let currentQuantity = parseInt(quantitySpan.textContent);
+        
+                    // Prevent going below 1 or above stock
+                    if (action === 'decrement' && currentQuantity <= 1) return;
+                    if (action === 'increment' && currentQuantity >= maxStock) {
+                        alert('Cannot exceed available stock');
+                        return;
+                    }
+        
+                    // Update quantity before API call for better UX
+                    currentQuantity = action === 'increment' ? currentQuantity + 1 : currentQuantity - 1;
+                    quantitySpan.textContent = currentQuantity;
+        
                     fetch(`/cart/update/${productId}/${action}/`, {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest',
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCSRFToken()
                         },
+                        body: JSON.stringify({ 
+                            action: action,
+                            quantity: currentQuantity
+                        })
                     })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        // Update the displayed quantity
-                        quantitySpan.textContent = data.quantity;
+                        if (data.error) {
+                            // Revert the quantity if there's an error
+                            quantitySpan.textContent = data.quantity;
+                            alert(data.error);
+                        } else {
+                            // Update all relevant displays
+                            quantitySpan.textContent = data.quantity;
+                            if (data.stock !== undefined) {
+                                document.querySelector('.description').textContent = `Stock: ${data.stock}`;
+                            }
+                            if (data.total_price !== undefined) {
+                                const totalPriceSpan = document.getElementById(`total-price-${productId}`);
+                                if (totalPriceSpan) {
+                                    totalPriceSpan.textContent = `$${data.total_price.toFixed(2)}`;
+                                }
+                            }
+                        }
                     })
-                    .catch(error => console.error('Error:', error));
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // Revert quantity on error
+                        quantitySpan.textContent = currentQuantity - (action === 'increment' ? 1 : -1);
+                        alert('There was an error updating the quantity. Please try again.');
+                    });
                 });
             });
+        
+            // Image Zoom Logic
+            const mainImage = document.getElementById('main-image');
+            const zoomContainer = document.getElementById('zoom-container');
+            const zoomedImage = document.getElementById('zoomed-image');
+            let isZoomed = false;
+        
+            // Setup zoom functionality
+            if (mainImage && zoomContainer && zoomedImage) {
+                mainImage.addEventListener('click', function() {
+                    if (!isZoomed) {
+                        zoomedImage.src = this.src;
+                        zoomContainer.style.display = 'flex';
+                        document.body.style.overflow = 'hidden';
+                        isZoomed = true;
+                    }
+                });
+        
+                zoomContainer.addEventListener('click', function(e) {
+                    if (e.target === zoomContainer) {
+                        zoomContainer.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                        isZoomed = false;
+                    }
+                });
+        
+                // Add keyboard support for closing zoom
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && isZoomed) {
+                        zoomContainer.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                        isZoomed = false;
+                    }
+                });
+            }
+        
+            // Thumbnail click handler
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            thumbnails.forEach(thumbnail => {
+                thumbnail.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const newSrc = this.src;
+                    mainImage.src = newSrc;
+                    
+                    // Update carousel active item
+                    const carouselItems = document.querySelectorAll('.carousel-item');
+                    carouselItems.forEach(item => {
+                        if (item.querySelector('img').src === newSrc) {
+                            item.classList.add('active');
+                        } else {
+                            item.classList.remove('active');
+                        }
+                    });
+                });
+            });
+        
+            function getCSRFToken() {
+                const csrfTokenElement = document.querySelector('[name=csrfmiddlewaretoken]');
+                return csrfTokenElement ? csrfTokenElement.value : '';
+            }
         });
     </script>
 
-    <script>
-        function changeMainImage(imageUrl) {
-            // Change the main image
-            const mainImage = document.getElementById('main-image');
-            mainImage.src = imageUrl;
-            
-            // Optionally, you can update the carousel to show the correct image.
-            // This assumes that the carousel slides match the images.
-            const carousel = new bootstrap.Carousel(document.getElementById('carouselExample'));
-            carousel.to(findCarouselIndex(imageUrl));
-        }
-    
-        function findCarouselIndex(imageUrl) {
-            const images = document.querySelectorAll('.carousel-item img');
-            for (let i = 0; i < images.length; i++) {
-                if (images[i].src === imageUrl) {
-                    return i;
-                }
-            }
-            return 0;  // Default to the first image if not found
-        }
-    </script>
-    
+    <style>
+       
+    </style>
 </body>
+
 {% endblock %}
 

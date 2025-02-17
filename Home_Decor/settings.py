@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     'home',
     'cart',
     'address',
+    'orders',
+    'payments'
 ]
 
 MIDDLEWARE = [
@@ -206,3 +208,26 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 LOGIN_REDIRECT_URL = 'http://127.0.0.1:8000/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}
+
+RAZORPAY_KEY_ID = "rzp_test_ew1QKEtTjY5hso"
+RAZORPAY_SECRET_KEY = "C3n7YFFeKcZi1cVszrKlRrNU"
+
+import razorpay
+
+client = razorpay.Client(auth=("rzp_test_ew1QKEtTjY5hso", "C3n7YFFeKcZi1cVszrKlRrNU"))

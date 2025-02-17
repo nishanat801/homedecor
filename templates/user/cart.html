@@ -167,14 +167,23 @@
                     <p>{{ item.product.description }}</p>
                     <p>Price: {{ item.product.price }}</p>
                 </div>
-    
-                <div class="item-quantity">
-                    <p>Quantity: {{ item.quantity }}</p>
+
+                <div class="quantity-add">
+                    <!-- Decrement Button -->
+                    <button class="quantity-btn update-cart" data-action="decrement" data-product-id="{{ item.product.id }}">-</button>
+                
+                    <!-- Display Quantity -->
+                    <span class="quantity" id="quantity-{{ item.product.id }}">{{ item.quantity }}</span>
+                
+                    <!-- Increment Button -->
+                    <button class="quantity-btn update-cart" data-action="increment" data-product-id="{{ item.product.id }}">+</button>
                 </div>
-    
+            
+                <!-- Total Price -->
                 <div class="item-total">
-                    <p>Total: {{ item.total_amount }}</p>
+                    <p>Total: <span id="total-price-{{ item.product.id }}">{{ item.total_amount }}</span> SAR</p>
                 </div>
+            
     
                 <div class="item-remove">
                     <form action="{% url 'remove_from_cart' item.product.id %}" method="POST">
@@ -192,11 +201,11 @@
         <aside class="order-summary">
             <h2>Order Summary</h2>
             <p>Subtotal ({{ cart_items.count }} items): ₹{{ subtotal }}</p>
-            <p>Saving: ₹{{ savings }}</p>
-            <p>Tax collected: ₹{{ tax }}</p>
+            {% comment %} <p>Saving: ₹{{ savings }}</p>
+            <p>Tax collected: ₹{{ tax }}</p> {% endcomment %}
             <p>Shipping: Calculated at checkout</p>
             <hr>
-            <p><strong>Estimated total: ₹{{ estimated_total }}</strong></p>
+            <p><strong>Estimated total: ₹{{ subtotal }}</strong></p>
             <form action="{% url 'address:address_list'  %}" method="post" style="display: inline;">
                 {% csrf_token %}
                 <button type="submit" class="checkout-btn">Proceed to Checkout</button>
@@ -207,10 +216,10 @@
     <button class="promo-btn">% Apply promo code</button>
 </main>
 
-{% endblock %}
+
 
 <script>
-    document.querySelectorAll('.increase-quantity').forEach(button => {
+    {% comment %} document.querySelectorAll('.increase-quantity').forEach(button => {
         button.addEventListener('click', (e) => {
             const productId = e.target.getAttribute('data-id');
             updateQuantity(productId, 1);
@@ -222,7 +231,7 @@
             const productId = e.target.getAttribute('data-id');
             updateQuantity(productId, -1);
         });
-    });
+    }); {% endcomment %}
 
     document.querySelectorAll('.remove-item').forEach(button => {
         button.addEventListener('click', (e) => {
@@ -231,26 +240,7 @@
         });
     });
 
-    {% comment %} function updateQuantity(productId, change) {
-        const quantitySpan = document.querySelector(`#cart-item-${productId} .quantity`);
-        let quantity = parseInt(quantitySpan.innerText);
-        quantity += change;
-
-        if (quantity < 1) {
-            quantity = 1; // Prevent negative quantity
-        }
-
-        quantitySpan.innerText = quantity;
-
-        // Update total for the item
-        const price = parseFloat(document.querySelector(`#cart-item-${productId} td:nth-child(2)`).innerText);
-        const totalPrice = price * quantity;
-        document.querySelector(`#cart-item-${productId} .total-price`).innerText = totalPrice.toFixed(2);
-
-        // Update order summary
-        updateCartSummary();
-    } {% endcomment %}
-
+  
     function removeItem(productId) {
         const row = document.querySelector(`#cart-item-${productId}`);
         row.remove();
@@ -259,23 +249,53 @@
         updateCartSummary();
     }
 
-    {% comment %} function updateCartSummary() {
-        let subtotal = 0;
-        let itemCount = 0;
-        document.querySelectorAll('.total-price').forEach(cell => {
-            subtotal += parseFloat(cell.innerText);
-            itemCount++;
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        document.body.addEventListener("click", function (event) {
+            // Check if the clicked element is one of the update-cart buttons
+            if (event.target.classList.contains("update-cart")) {
+                console.log("Button Clicked!");  // Debugging
+    
+                let productId = event.target.getAttribute("data-product-id");
+                let action = event.target.getAttribute("data-action");
+    
+                console.log("Product ID:", productId, "Action:", action);  // Debugging
+    
+                fetch(`/cart/update/${productId}/${action}/`, {
+                    method: "GET",
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                })
+                .then(response => {
+                    // Check if response is successful
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Response received:", data);  // Debugging
+    
+                    if (data.quantity === 0) {
+                        location.reload();  // Reload page if item removed
+                    } else {
+                        // Update quantity display
+                        let quantityElement = document.getElementById(`quantity-${productId}`);
+                        if (quantityElement) {
+                            quantityElement.innerText = data.quantity;
+                        }
+    
+                        // Update total price per item
+                        let priceElement = document.getElementById(`total-price-${productId}`);
+                        if (priceElement) {
+                            priceElement.innerText = data.total_price.toFixed(2) + " SAR";  // Update price
+                        }
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            }
         });
-
-        // Assume you have tax and savings logic based on subtotal
-        const savings = 110.00; // Example savings
-        const tax = 73.40; // Example tax
-        const estimatedTotal = subtotal - savings + tax;
-
-        // Update the DOM elements with new values
-        document.getElementById('subtotal').innerText = subtotal.toFixed(2);
-        document.getElementById('savings').innerText = savings.toFixed(2);
-        document.getElementById('estimated-total').innerText = estimatedTotal.toFixed(2);
-    } {% endcomment %}
-
+    });
+    
+    
 </script>
+{% endblock %}

@@ -14,6 +14,13 @@ class Address(models.Model):
     landmark = models.CharField(max_length=255, blank=True, null=True)
     is_saved = models.BooleanField(default=True)
     address_type = models.CharField(max_length=50, choices=[('Home', 'Home'), ('Office', 'Office')])
+    is_default = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if self.is_default:
+            # Unset previous default address for this user
+            Address.objects.filter(user=self.user, is_default=True).update(is_default=False)
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.full_name} - {self.address_type}"
+        return f"{self.full_name} - {self.address_type} {'(Default)' if self.is_default else ''}"

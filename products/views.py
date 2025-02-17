@@ -4,87 +4,133 @@ from .models import Product
 from category.models import Category
 from random import sample
 from .models import ProductAttribute
+from PIL import Image
+from io import BytesIO
+from django.core.files.base import ContentFile
+from django.contrib import messages
+
+def crop_resize_image(image, size=(300, 300)):
+    """Resize and crop the image to the given size."""
+    img = Image.open(image)
+    img = img.convert("RGB")  # Convert to RGB to avoid issues with PNG
+    img = img.resize(size, Image.LANCZOS)  # Use LANCZOS instead of ANTIALIAS
+
+    # Save image to memory
+    img_io = BytesIO()
+    img.save(img_io, format='JPEG', quality=90)  # Save as JPEG with quality 90
+    return ContentFile(img_io.getvalue(), name=image.name)
 
 # @user_passes_test(lambda user: user.is_superuser)
 def product_list(request):
     products = Product.objects.filter(is_active=True)
     return render(request, 'admin/product_list.html', {'products': products})
+
 # add product
 def add_product(request):
     if request.method == 'POST':
-        # Retrieve and validate form inputs
         name = request.POST['name']
         category_id = request.POST['category']
         price = request.POST['price']
+        
         stock = request.POST['stock']
         description = request.POST['description']
-        # brand = request.POST.get('brand', '')
-        # colors = request.POST.getlist('colors')
 
-        try:
-            # Validate and fetch the category
-            category = get_object_or_404(Category, id=int(category_id))
-        except ValueError:
-            return JsonResponse({'error': 'Invalid category ID'}, status=400)
+        # Case-insensitive check for existing product name
+        if Product.objects.filter(name__iexact=name).exists():
+            messages.error(request, "A product with this name already exists.")
+            return redirect('products:add_product')  # Redirect back to the form
 
-        # Create the product
-        product = Product.objects.create(
+        category = get_object_or_404(Category, id=int(category_id))
+        
+        # Create the product object but don't save it yet
+        product = Product(
             name=name,
             category=category,
             price=price,
             stock=stock,
-            description=description,
-            # brand=brand,
-            # available_colors=colors
+            description=description
         )
 
-        # Handle uploaded images
+        # Handle uploaded images and crop them
         for i in range(1, 4):
             image = request.FILES.get(f'image{i}')
             if image:
-                setattr(product, f'image{i}', image)
+                processed_image = crop_resize_image(image)  # Crop & resize
+                if i == 1:
+                    product.image1.save(image.name, processed_image, save=False)
+                elif i == 2:
+                    product.image2.save(image.name, processed_image, save=False)
+                elif i == 3:
+                    product.image3.save(image.name, processed_image, save=False)
 
+        # Save the product after assigning images
         product.save()
-         
-        print("Product added, redirecting to product list...")
-        # Add attributes
-        colors = request.POST.getlist('colors')  # Expecting a list of colors
-        materials = request.POST.getlist('materials')  # Expecting a list of materials
-        
+
+        # Save product attributes
+        colors = request.POST.get('colors', '').split(',')
+        materials = request.POST.get('materials', '').split(',')
+
         for color in colors:
-            ProductAttribute.objects.create(product=product, attribute_type='color', value=color)
+            if color.strip():
+                ProductAttribute.objects.create(product=product, attribute_type='color', value=color.strip())
         for material in materials:
-            ProductAttribute.objects.create(product=product, attribute_type='material', value=material)
+            if material.strip():
+                ProductAttribute.objects.create(product=product, attribute_type='material', value=material.strip())
 
         return redirect('products:product_list')
 
-    # Render the add product page
     categories = Category.objects.filter(is_active=True)
     return render(request, 'admin/add_product.html', {'categories': categories})
+
+
 
 
 # edit product
 def edit_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    if request.method == 'POST':
-        product.name = request.POST['name']
-        category_id = request.POST['category']
-        product.category = get_object_or_404(Category, id=category_id)
-        product.price = request.POST['price']
-        product.stock = request.POST['stock']
-        product.description = request.POST['description']
-        # product.brand = request.POST.get('brand', '')
-        # product.available_colors = request.POST.getlist('colors')
 
+    if request.method == 'POST':
+        # Retrieve values from the POST request
+        name = request.POST['name']
+        category_id = request.POST['category']
+        price = request.POST['price']
+        stock = request.POST['stock']
+        description = request.POST['description']
+
+        # Case-insensitive check for existing product name (excluding the current product)
+        if Product.objects.filter(name__iexact=name).exclude(id=product_id).exists():
+            messages.error(request, "A product with this name already exists.")
+            return redirect('products:edit_product', product_id=product_id)
+
+        # Update the product fields
+        product.name = name
+        product.category = get_object_or_404(Category, id=category_id)
+        product.price = price
+        product.stock = stock
+        product.description = description
+
+        # Process images with cropping
         for i in range(1, 4):
             image = request.FILES.get(f'image{i}')
             if image:
-                setattr(product, f'image{i}', image)
+                processed_image = crop_resize_image(image)  # Crop & resize the new image
+                
+                # Assign the processed image correctly
+                if i == 1:
+                    product.image1.save(image.name, processed_image, save=False)
+                elif i == 2:
+                    product.image2.save(image.name, processed_image, save=False)
+                elif i == 3:
+                    product.image3.save(image.name, processed_image, save=False)
 
-        product.save()
+        product.save()  # Save after all changes
+        messages.success(request, "Product updated successfully!")
         return redirect('products:product_list')
 
-    return render(request, 'admin/edit_product.html', {'product': product, 'categories': Category.objects.filter(is_active=True)})
+    return render(request, 'admin/edit_product.html', {
+        'product': product,
+        'categories': Category.objects.filter(is_active=True)
+    })
 
 #delete product 
 def delete_product(request, product_id):

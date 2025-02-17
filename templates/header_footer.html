@@ -45,10 +45,26 @@
         justify-content: space-between;
     }
 
-    header .logo {
-        font-size: 24px;
-        font-weight: bold;
-    }
+    .logo {
+      font-size: 36px;
+      font-weight: bold;
+      color:rgb(244, 229, 227); /* Add a vibrant color for a stylish effect */
+      font-family: 'Arial', sans-serif;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 10px;
+      background: linear-gradient(45deg,rgb(210, 177, 120), #d3b787);
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      display: inline-block;
+      transition: all 0.3s ease;
+  }
+  
+  .logo:hover {
+      transform: scale(1.1); /* Slightly increase size on hover */
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Add a subtle shadow effect */
+      cursor: pointer;
+  }
 
     header .search-bar {
         display: flex;
@@ -168,7 +184,7 @@
     <!-- Header -->
     <header>
       <div class="container">
-        <div class="logo">HomeDecor</div>
+        <a href="{% url 'products_user' %}" class="logo">HomeDecor</a>
         <div class="search-bar">
           <input type="text" placeholder="What are you looking for?">
           <button type="submit">🔍</button>

@@ -3,79 +3,154 @@
 {% block title %}Order list - Home Decor{% endblock %}
 
 {% block content %}
-  <style>
-    /* For the container to hold the entire content */
+ <style>
+   
+
     .container {
-      margin-top: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    /* Style for the row displaying the orders */
-    .row.row-cols-1.row-cols-md-2.row-cols-lg-3.g-4 {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-
-    /* Style for each order card */
-    .card.h-100 {
-      width: 100%;
-      box-sizing: border-box;
-      border-radius: 8px;
-      border: 1px solid #ddd;
+    .order-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 20px;
       margin-bottom: 20px;
+      transition: transform 0.3s ease-in-out;
     }
 
-    /* Order items row */
-    .card-footer .row.row-cols-1.row-cols-md-2.g-2 {
-      display: flex;             /* Use flexbox */
-      flex-wrap: nowrap;         /* Prevent items from wrapping onto a new line */
-      overflow-x: auto;          /* Allows horizontal scrolling if items overflow */
-      gap: 10px;                 /* Space between items */
+    .order-card:hover {
+      transform: scale(1.02);
     }
 
-    /* Style for each order item (card) */
-    .card-footer .row .col {
-      flex: 0 0 auto;  /* Prevent the column from shrinking */
-      width: 200px;    /* Set a fixed width for each item card */
+    h3, h4 {
+      color: #333;
+      margin-bottom: 10px;
     }
 
-    /* Ensures images are responsive and properly aligned */
-    .card-img-top {
-      width: 100%;
+    p {
+      color: #555;
+      margin: 5px 0;
+    }
+
+    .order-details, .shipping-address, .items {
+      padding: 15px 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .items ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+    }
+
+    .items li {
+      flex: 0 0 auto;
+      background: #f1f1f1;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      min-width: 200px;
+    }
+
+    .items img {
+      width: 100px;
       height: auto;
+      border-radius: 5px;
     }
+
+    .no-orders {
+      text-align: center;
+      color: #999;
+      font-size: 18px;
+      margin-top: 50px;
+    }
+
+    .cancel-btn {
+      background-color: red;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      cursor: pointer;
+      margin-top: 10px;
+  }
+  .cancel-btn:hover {
+      background-color: darkred;
+  }
+
+  .cancelled-label {
+    color: red;
+    font-weight: bold;
+}
   </style>
 </head>
 <body>
+  <div class="container">
+    {% for order in orders %}
+    <div class="order-card">
+        <h3>Order #{{ order.order_number }}</h3>
+        <div class="order-details">
+            <p><strong>Order Date:</strong> {{ order.order_date }}</p>
+            <p><strong>Status:</strong> {{ order.status }}</p>
+            <p><strong>Total Price:</strong> {{ order.total_price }}</p>
+            <p><strong>Estimated Delivery:</strong> {{ order.estimated_delivery }}</p>
+        </div>
+    
+        <div class="shipping-address">
+            <h4>Shipping Address</h4>
+            <p>{{ order.address.full_name }}</p>
+            <p>{{ order.address.address_line_1 }}</p>
+            <p>{{ order.address.city }}</p>
+        </div>
+    
+        <div class="items">
+            <h4>Items</h4>
+            <ul>
+                {% for item in order.items %}
+                <li>
+                    <img src="{{ item.product_images.0 }}" alt="Product Image" style="width: 100px; height: auto;">
+                    <p><strong>{{ item.product_name }}</strong></p>
+                    <p>Quantity: {{ item.quantity }}</p>
+                    <p>Price: {{ item.price }}</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    
+        {% if order.id %}
+        <form action="{% url 'orders:cancel_order' order.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="cancel-btn">Cancel Order</button>
+        </form>
+    {% else %}
+        <p>Error: Order ID is missing.</p>
+    {% endif %}
 
-  {% for order in orders %}
-  <div class="order-card">
-      <h3>Order #{{ order.order_number }}</h3>
-      <p>Order Date: {{ order.order_date }}</p>
-      <p>Status: {{ order.status }}</p>
-      <p>Total Price: ${{ order.total_price }}</p>
-      <p>Estimated Delivery: {{ order.estimated_delivery }}</p>
-  
-      <h4>Shipping Address:</h4>
-      <p>{{ order.address.full_name }}</p>
-      <p>{{ order.address.address_line_1 }}</p>
-      <p>{{ order.address.city }}</p>
-  
-      <h4>Items:</h4>
-      <ul>
-          {% for item in order.items %}
-              <li>
-                  <img src="{{ item.product_images.0 }}" alt="Product Image" width="50">
-                  <p>{{ item.product_name }}</p>
-                  <p>Quantity: {{ item.quantity }}</p>
-                  <p>Price: ${{ item.price }}</p>
-              </li>
-          {% endfor %}
-      </ul>
+
+    <div class="order-details">
+          {% if order.status == "cancelled" %}
+              <span class="cancelled-label">Cancelled</span>
+          {% else %}
+              {{ order.status }}
+          {% endif %}
   </div>
-  {% empty %}
-  <p>No orders found.</p>
-  {% endfor %}
 
+    </div>
+    {% empty %}
+    <p class="no-orders">No orders found.</p>
+    {% endfor %}
+    
+  </div>
+  {% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <p class="{{ message.tags }}">{{ message }}</p>
+    {% endfor %}
+</div>
+{% endif %}
 </body>
-{% endblock %}
+</html>
+{% endblock%}

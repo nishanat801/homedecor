@@ -1,21 +1,20 @@
-from django import forms
-from .models import Order
+# from django import forms
+# from .models import Order
 
-class OrderForm(forms.ModelForm):
-    class Meta:
-        model = Order
-        fields = ['total_price', 'shipping_address']
-
-    # Additional fields (not in the model) can be added manually
-    payment_method = forms.ChoiceField(choices=[
-        ('credit_card', 'Credit Card'),
-        ('paypal', 'PayPal'),
-        ('cod', 'Cash on Delivery')
-    ], required=True)
-
-    def __init__(self, *args, **kwargs):
-        super(OrderForm, self).__init__(*args, **kwargs)
-        self.fields['shipping_address'].widget.attrs.update({
-            'placeholder': 'Enter your shipping address',
-            'class': 'form-control'
-        })
+# class OrderForm(forms.ModelForm):
+#     class Meta:
+#         model = Order
+#         fields = ['total_price', 'shipping_address']
+        
+#     def clean(self):
+#         cleaned_data = super().clean()
+#         total_price = cleaned_data.get('total_price')
+#         shipping_address = cleaned_data.get('shipping_address')
+        
+#         if not total_price or total_price <= 0:
+#             raise forms.ValidationError("Invalid total price")
+        
+#         if not shipping_address:
+#             raise forms.ValidationError("Shipping address is required")
+        
+#         return cleaned_data

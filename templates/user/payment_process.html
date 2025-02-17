@@ -1,0 +1,13 @@
+{% extends 'header_footer.html' %}
+
+{% block title %}Payment_process - Home Decor{% endblock %}
+
+{% block content %}
+<h2>Payment Processing</h2>
+<p>Selected Payment Method: {{ payment_method }}</p>
+
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit">Pay Now</button>
+</form>
+{% endblock %}

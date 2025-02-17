@@ -1,0 +1,150 @@
+{% extends 'header_footer.html' %}
+
+{% block title %}Order Summary - Checkout - Home Decor{% endblock %}
+
+{% block content %}
+    
+{% load static %}
+
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: Aria;l, sans-serif;
+            background-color: #d3b787
+        }
+        .order-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .item-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+        .item-details {
+            flex-grow: 1;
+        }
+        .item-price {
+            font-weight: bold;
+            color: #333;
+        }
+        .summary {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f8f8;
+            border-radius: 5px;
+        }
+        .total {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: right;
+        }
+        .razorpay-btn {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 20px auto;
+            padding: 15px;
+            background-color: #2d88ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .razorpay-btn:hover {
+            background-color: #1a73e8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Order Summary</h1>
+        
+        <!-- Loop through order items -->
+        {% for item in order_items %}
+        <div class="order-item">
+            <img src="{{ item.product.image1.url }}" alt="{{ item.product.name }}" class="item-image">
+            <div class="item-details">
+                <h3>{{ item.product.name }}</h3>
+                <p>Quantity: {{ item.quantity }}</p>
+                <p class="item-price">₹{{ item.product.price }}</p>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Order Summary -->
+        <div class="summary">
+            <p>Subtotal: ₹{{ subtotal }}</p>
+            <p>Shipping: ₹{{ shipping }}</p>
+            <p class="total">Total Amount: ₹{{ total_amount }}</p>
+        </div>
+
+        <!-- Razorpay Payment Button -->
+        <button id="rzp-button" class="razorpay-btn">Pay with Razorpay</button>
+    </div>
+
+    <!-- Razorpay Script -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        document.getElementById('rzp-button').onclick = function(e) {
+            var options = {
+                "key": "{{ razorpay_key }}",
+                "amount": "{{ total_amount|floatformat:2 }}" * 100,
+                "currency": "INR",
+                "name": "Your Store Name",
+                "description": "Order Payment",
+                "order_id": "{{ razorpay_order_id }}",
+                "handler": function (response) {
+                    fetch('/payment-success/', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            order_id: response.razorpay_order_id,  
+                            payment_id: response.razorpay_payment_id,
+                            signature: response.razorpay_signature
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log("Server Response:", data);  // ✅ Debugging step
+                        if (data.status === "success") {
+                            alert("Payment successful! Payment ID: " + response.razorpay_payment_id);
+                            window.location.href = "/order-success/";
+                        } else {
+                            alert("Payment failed: " + data.message);  // ✅ Show actual error message
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error in fetch:", error);  // ✅ Debugging step
+                        alert("An error occurred. Please try again.");
+                    });
+                },
+                "prefill": {
+                    "name": "{{ request.user.username }}",
+                    "email": "{{ request.user.email }}"
+                },
+                "theme": {
+                    "color": "#2d88ff"
+                }
+            };
+    
+            var rzp = new Razorpay(options);
+            rzp.open();
+        };
+    </script>
+</body>
+</html>
+{% endblock%}
+
+
+

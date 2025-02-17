@@ -62,67 +62,63 @@
     </div>
     <div class="card">
       <div class="card-body">
-        <h4>Order ID: {{ order.order_id }}</h4>
+        <h4>Order ID: {{ order.id }}</h4>
         <p>Tracking Number: <strong>{{ order.tracking_number }}</strong></p>
         <p>User: <strong>{{ order.user.username }}</strong></p>
-        <p>Shipping Address: <strong>{{ order.shipping_address }}</strong></p>
-        <p>Total Price: <strong>₹{{ order.total_price }}</strong></p>
+        <p>Shipping Address: <strong>{{ shipping_address }}</strong></p>
+        <p>Total Price: <strong>₹{{ total_price }}</strong></p>
+        
+        {% comment %}
         <p>Payment Type: <strong>{{ order.get_payment_type_display }}</strong></p>
+        {% endcomment %}
+        
         {% if order.payment_status == 'Failure' %}
-          <p>Payment Status: <span style="color: red;">{{ order.get_payment_status_display }}</span></p>
+            <p>Payment Status: <span style="color: red;">{{ order.status }}</span></p>
         {% else %}
-          <p>Payment Status: {{ order.get_payment_status_display }}</p>
+            <p>Payment Status: {{ order.status}}</p>
         {% endif %}
         
         <h5>Order Items:</h5>
         <table class="table">
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Quantity</th>
-              <th>Price</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for item in order.items.all %}
-            <tr>
-              <td>{{ item.product.name }}</td>
-              <td>{{ item.quantity }}</td>
-              <td>₹{{ item.price }}</td>
-              <td>{{ item.get_status_display }}</td>
-            
-              <td>
-                {% if item.status == 'Order Pending' %}
-                  <form method="POST" action="{% url 'change_order_status' item.Orderitem_id 'Order Confirmed' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-info">Confirm</button>
-                  </form>
-                {% elif item.status == 'Order Confirmed' %}
-                  <form method="POST" action="{% url 'change_order_status' item.Orderitem_id 'Shipped' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-warning">Ship</button>
-                  </form>
-                {% elif item.status == 'Shipped' %}
-                  <form method="POST" action="{% url 'change_order_status' item.Orderitem_id 'Delivered' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-success">Deliver</button>
-                  </form>
-                {% elif item.status == 'Requested Return' %}
-                  <form method="POST" action="{% url 'change_order_status' item.Orderitem_id 'Returned' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-success">Approve Return</button>
-                  </form>
-                  <form method="POST" action="{% url 'change_order_status' item.Orderitem_id 'Cancelled' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Reject Return</button>
-                  </form>
-                {% endif %}
-              </td>
-            </tr>
-            {% endfor %}
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+              {% if order_items %}
+              {% for item in order_items %}
+                  <tr>
+                      <td>{{ item.product.name }}</td>
+                      <td>{{ item.quantity }}</td>
+                      <td>₹{{ item.price }}</td>
+                      <td>{{ item.order.status }}</td>
+                      <td>
+                        <form method="POST">
+                          {% csrf_token %}
+                          <input type="hidden" name="item_id" value="">
+                          <select name="new_status" class="form-select" onchange="this.form.submit()">
+                              <option value="" disabled selected>Change Order Status</option>
+                              <option value="Pending" {% if order.status == 'Pending' %} selected {% endif %}>Pending</option>
+                              <option value="Shipped" {% if order.status == 'Shipped' %} selected {% endif %}>Shipped</option>
+                              <option value="Delivered" {% if order.status == 'Delivered' %} selected {% endif %}>Delivered</option>
+                          </select>
+                      </form>
+                      </td>
+                  </tr>
+              {% endfor %}
+          {% else %}
+              <tr>
+                  <td colspan="5" style="text-align: center; color: red;">No items found.</td>
+              </tr>
+          {% endif %}
           </tbody>
+          
+          
         </table>
       </div>
     </div>

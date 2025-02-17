@@ -212,7 +212,7 @@
         <div class="account-card">
           <h2>Orders</h2>
           <p>View and manage your orders.</p>
-          <a href="{% url 'user: user_orders' %}" class="card-button">Manage Orders</a>
+          <a href="{% url 'orders:user_order_list' %}" class="card-button">Manage Orders</a>
         </div>
        
         <!-- Personal Info -->
@@ -226,7 +226,7 @@
         <div class="account-card">
           <h2>Address Management</h2>
           <p>Manage your saved addresses.</p>
-          <a href="#" class="card-button">Manage Address</a>
+          <a href="{% url 'address:address_list' %}" class="card-button">Manage Address</a>
         </div>
 
         <!-- Wallets -->

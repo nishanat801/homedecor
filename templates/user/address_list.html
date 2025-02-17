@@ -1,0 +1,99 @@
+{% extends 'header_footer.html' %}
+{% block content %}
+
+<form method="POST" action="{% url 'address:select_address' %}">
+    {% csrf_token %}
+    
+    <!-- Show Default Address -->
+    {% if default_address %}
+    <div class="address-card default-address">
+        <p><strong>{{ default_address.full_name }}</strong> <span class="badge">Default</span></p>
+        <p>{{ default_address.address }}, {{ default_address.city }}, {{ default_address.state }} - {{ default_address.pincode }}</p>
+        <p>{{ default_address.phone_number }}</p>
+        <button type="submit" name="address_id" value="{{ default_address.id }}">Select Address</button>
+        <a href="{% url 'address:edit_address' default_address.id %}" class="edit-btn">Edit</a>
+        <a href="{% url 'address:delete_address' default_address.id %}" class="delete-btn">Delete</a>
+    </div>
+    {% else %}
+    <p>No default address set. Please add an address.</p>
+    {% endif %}
+
+    <!-- "See More" Button -->
+    {% if remaining_addresses %}
+    <button id="see-more-btn" onclick="toggleAddresses(event)">See More</button>
+    <div id="remaining-addresses" style="display: none;">
+        {% for address in remaining_addresses %}
+        <div class="address-card">
+            <p><strong>{{ address.full_name }}</strong></p>
+            <p>{{ address.address }}, {{ address.city }}, {{ address.state }} - {{ address.pincode }}</p>
+            <p>{{ address.phone_number }}</p>
+            <input type="radio" name="is_default" value="{{ address.id }}" 
+                {% if address.is_default %}checked{% endif %} onclick="setDefaultAddress(this)">
+            <label>Set as Default</label>
+            <button type="submit" name="address_id" value="{{ address.id }}">Select Address</button>
+            <a href="{% url 'address:edit_address' address.id %}" class="edit-btn">Edit</a>
+            <a href="{% url 'address:delete_address' address.id %}" class="delete-btn">Delete</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</form>
+
+<!-- Add New Address Button -->
+<button class="add-address-btn" onclick="showAddressForm(event)">+ Add New Address</button>
+
+<!-- Address Form -->
+<div id="address-form-section" style="display: none;">
+    <h2>Add Delivery Address</h2>
+    <form action="{% url 'address:address_list' %}" method="POST" class="address-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <label>
+            <input type="checkbox" name="is_default"> Make this my default address
+        </label>
+        <button type="submit" class="save-btn">Save Address</button>
+    </form>
+</div>
+
+
+
+<script>
+    function toggleAddresses(event) {
+        event.preventDefault();
+        document.getElementById('remaining-addresses').style.display = 'block';
+        document.getElementById('see-more-btn').style.display = 'none';
+    }
+
+    function showAddressForm(event) {
+        event.preventDefault();
+        document.getElementById('address-form-section').style.display = 'block';
+    }
+
+    function setDefaultAddress(radio) {
+        fetch("{% url 'address:set_default' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ address_id: radio.value })
+        }).then(response => {
+            if (response.ok) {
+                location.reload();
+            }
+        });
+    }
+</script>
+<style>
+    .address-container { max-width: 600px; margin: auto; padding: 20px; }
+    .address-list { margin-bottom: 20px; }
+    .address-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px; }
+    .add-address-btn, .save-btn { background-color: #007bff; color: #fff; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; }
+    .add-address-btn:hover, .save-btn:hover { background-color: #0056b3; }
+    .input-group { margin-bottom: 15px; }
+    .input-group label { display: block; font-weight: bold; margin-bottom: 5px; }
+    .input-group input, .input-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+    .hidden { display: none; }
+</style>
+{% endblock %}
+

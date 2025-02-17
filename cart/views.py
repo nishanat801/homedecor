@@ -8,18 +8,12 @@ def cart_view(request):
     # Fetch cart items for the logged-in user
     cart_items = Cart.objects.filter(user=request.user)  # Assuming Cart has a 'user' field
     subtotal = sum(item.product.price * item.quantity for item in cart_items)
-
-    # Assuming savings, tax, and estimated total logic
-    savings = 110  # Example savings
-    tax = 73 # Example tax
-    estimated_total = subtotal - savings + tax
-
     context = {
         'cart_items': cart_items,
         'subtotal': subtotal,
-        'savings': savings,
-        'tax': tax,
-        'estimated_total': estimated_total,
+        # 'savings': savings,
+        # 'tax': tax,
+        # 'estimated_total': estimated_total,
         'cart_item_count': cart_items.count(),
     }
 
@@ -38,22 +32,35 @@ def add_to_cart(request, product_id):
 
 @login_required
 def update_quantity(request, product_id, action):
-    # Fetch the cart item for the logged-in user
-    cart_item = Cart.objects.get(product_id=product_id, user=request.user)  # Assuming user is a field
-    
-    if action == 'increment':
-        cart_item.quantity += 1
-    elif action == 'decrement' and cart_item.quantity > 1:
-        cart_item.quantity -= 1
-    
-    cart_item.save()
+    cart_item = get_object_or_404(Cart, product_id=product_id, user=request.user)
+    product = get_object_or_404(Product, id=product_id)
 
-    # Return updated quantity and total price as JSON response
+    if action == "increment":
+        if cart_item.quantity < product.stock:  # Check if stock is available
+            cart_item.quantity += 1
+            cart_item.save()
+        else:
+            return JsonResponse({
+                "error": "Not enough stock available!",
+                "quantity": cart_item.quantity
+            })
+
+    elif action == "decrement":
+        if cart_item.quantity > 1:
+            cart_item.quantity -= 1
+            cart_item.save()
+        else:
+            cart_item.delete()
+            return JsonResponse({"quantity": 0})  # Remove item if quantity reaches 0
+
+    # Calculate the total price for this product
     total_price = cart_item.product.price * cart_item.quantity
+
     return JsonResponse({
-        'quantity': cart_item.quantity,
-        'total_price': total_price
+        "quantity": cart_item.quantity,
+        "total_price": total_price
     })
+
 
 @login_required
 def remove_from_cart(request, product_id):
@@ -65,6 +72,9 @@ def remove_from_cart(request, product_id):
         except Cart.DoesNotExist:
             return redirect('cart')  # Redirect even if the item doesn't exist
     return redirect('cart')  # Redirect for invalid requests
+
+
+
 
 
 @login_required

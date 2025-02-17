@@ -103,16 +103,16 @@
                 </thead>
                 <tbody>
                   {% for order in orders %}
-                    <tr>
+                  <tr>
                       <td>{{ order.tracking_number }}</td>
-                      <td>{{ order.user.username }}</td>
+                      <td>{{ order.user }}</td>
                       <td>{{ order.shipping_address }}</td>
                       <td>₹{{ order.total_price }}</td>
                       <td>{{ order.created_at|date:'d M Y' }}</td>
                       <td>
-                        <a href="{% url 'user:order_details' order.id %}">View Order</a>
+                          <a href="{% url 'orders:admin_order_details' order.id %}">View Order</a>
                       </td>
-                    </tr>
+                  </tr>
                   {% endfor %}
                 </tbody>
               </table>
