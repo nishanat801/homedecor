@@ -197,23 +197,23 @@
     <!-- Filter and Sort Options -->
     <div class="filter-sort-container">
         <div class="filter">
-            <label for="material-filter">Filter by Material:</label>
+            {% comment %} <label for="material-filter">Filter by Material:</label>
             <select id="material-filter" onchange="filterProducts()">
                 <option value="">All</option>
                 {% for material in materials %}
                     <option value="{{ material.id }}">{{ material.name }}</option>
                 {% endfor %}
-            </select>
+            </select> {% endcomment %}
         </div>
     
         <div class="filter">
-            <label for="color-filter">Filter by Color:</label>
+            {% comment %} <label for="color-filter">Filter by Color:</label>
             <select id="color-filter" onchange="filterProducts()">
                 <option value="">All</option>
                 {% for color in colors %}
                     <option value="{{ color.id }}">{{ color.name }}</option>
                 {% endfor %}
-            </select>
+            </select> {% endcomment %}
         </div>
         
         <div class="sort">
@@ -229,6 +229,10 @@
     
 
     <!-- Product grid -->
+
+    <!-- Results will be displayed here -->
+    <div id="searchResults"></div>
+
     <div class="product-grid">
         {% for product in products %}
             <div class="product">

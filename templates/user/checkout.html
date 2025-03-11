@@ -179,168 +179,340 @@
         }
     }
     </style>
-</head>
-<body>
-    <div class="checkout-container">
-        <h1 class="checkout-title">Checkout</h1>
-        
-        <form method="POST" action="{% url 'orders:place_order' %}">
-            {% csrf_token %}
-            {{ form.non_field_errors }}
-            <div class="checkout-grid">
-                <div class="main-content">
-                    <!-- Customer Details Section -->
-                    <div class="checkout-card">
-                        <div class="section-heading">
-                            <i class="fas fa-user"></i> Customer Details
-                        </div>
-                        <div class="customer-details-display">
-                            <div class="details-group">
-                                <label>Full Name</label>
-                                <p class="name">{{ selected_address.full_name }}</p>
-                            </div>
-                            <div class="details-group">
-                                <label>Email</label>
-                                <p class="detail-value">{{ request.user.email }}</p>
-                            </div>
-                            <div class="details-group">
-                                <label>Phone Number</label>
-                                <p class="detail-value">{{ selected_address.phone_number }}</p>
-                            </div>
-                        </div>
+    <body>
+        <div class="checkout-container">
+            <h1 class="checkout-title">Checkout</h1>
+            
+            <form method="POST" action="{% url 'orders:place_order' %}" id="checkout-form">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
                 
-            
-                    <!-- Delivery Address Section -->
-                    <div class="checkout-card">
-                        <div class="section-heading">
-                            <i class="fas fa-map-marker-alt"></i> Delivery Address
-                        </div>
-            
-                        {% if selected_address %}
-                        <div class="address-box selected">
-                            <div class="address-content">
-                                <input type="radio" name="address_id" value="{{ selected_address.id }}" checked>
-                                <div class="address-details">
+                <div class="checkout-grid">
+                    <div class="main-content">
+                        <!-- Customer Details Section -->
+                        <div class="checkout-card">
+                            <div class="section-heading">
+                                <i class="fas fa-user"></i> Customer Details
+                            </div>
+                            <div class="customer-details-display">
+                                <div class="details-group">
+                                    <label>Full Name</label>
                                     <p class="name">{{ selected_address.full_name }}</p>
-                                    <p>{{ selected_address.address }}</p>
-                                    {% if selected_address.area %}
-                                    <p>Area: {{ selected_address.area }}</p>
-                                    {% endif %}
-                                    {% if selected_address.landmark %}
-                                    <p>Landmark: {{ selected_address.landmark }}</p>
-                                    {% endif %}
-                                    <p>{{ selected_address.city }}, {{ selected_address.state }} - {{ selected_address.pincode }}</p>
-                                    <p>Phone: {{ selected_address.phone_number }}</p>
-                                    <p>Address Type: {{ selected_address.address_type }}</p>
+                                </div>
+                                <div class="details-group">
+                                    <label>Email</label>
+                                    <p class="detail-value">{{ request.user.email }}</p>
+                                </div>
+                                <div class="details-group">
+                                    <label>Phone Number</label>
+                                    <p class="detail-value">{{ selected_address.phone_number }}</p>
                                 </div>
                             </div>
                         </div>
-                        {% else %}
-                        <p>No address selected. Please go back and <a href="{% url 'address:address_list' %}">select an address</a>.</p>
-                        {% endif %}
+    
+                        <!-- Delivery Address Section -->
+                        <div class="checkout-card">
+                            <div class="section-heading">
+                                <i class="fas fa-map-marker-alt"></i> Delivery Address
+                            </div>
+                
+                            {% if selected_address %}
+                            <div class="address-box selected">
+                                <div class="address-content">
+                                    <input type="radio" name="address_id" value="{{ selected_address.id }}" checked>
+                                    <div class="address-details">
+                                        <p class="name">{{ selected_address.full_name }}</p>
+                                        <p>{{ selected_address.address }}</p>
+                                        {% if selected_address.area %}
+                                        <p>Area: {{ selected_address.area }}</p>
+                                        {% endif %}
+                                        {% if selected_address.landmark %}
+                                        <p>Landmark: {{ selected_address.landmark }}</p>
+                                        {% endif %}
+                                        <p>{{ selected_address.city }}, {{ selected_address.state }} - {{ selected_address.pincode }}</p>
+                                        <p>Phone: {{ selected_address.phone_number }}</p>
+                                        <p>Address Type: {{ selected_address.address_type }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <p>No address selected. Please go back and <a href="{% url 'address:address_list' %}">select an address</a>.</p>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-
-                   <!-- Payment Method Section -->
-<div class="checkout-card">
-    <div class="section-heading">
-        <i class="fas fa-credit-card"></i>
-        Payment Method
-    </div>
     
-    <div class="payment-methods">
-        <div class="payment-option" id="cod-option">
-            <div class="payment-content">
-                <input type="radio" name="payment_method" value="cod">
-                <i class="fas fa-money-bill-wave"></i>
-                <div class="payment-details">
-                    <p class="name">Cash on Delivery</p>
-                    <p>Pay when you receive</p>
-                </div>
-            </div>
-        </div>
+                <!-- Payment Method Section -->
+                <div class="checkout-card">
+                    <div class="section-heading">
+                        <i class="fas fa-credit-card"></i> Payment Method
+                    </div>
+                    <div class="payment-methods">
+                        <div class="payment-option" id="cod-option">
+                            <label>
+                                <input type="radio" name="payment_method" value="cod">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <div class="payment-details">
+                                    <p class="name">Cash on Delivery</p>
+                                    <p>Pay when you receive</p>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="payment-option" id="razorpay-option">
+                            <label>
+                                <input type="radio" name="payment_method" value="razorpay">
+                                <i class="fas fa-credit-card"></i>
+                                <div class="payment-details">
+                                    <p class="name">Razorpay</p>
+                                    <p>Pay securely with Razorpay</p>
+                                </div>
 
-        <div class="payment-option" id="razorpay-option">
-            <div class="payment-content">
-                <input type="radio" name="payment_method" value="razorpay">
-                <i class="fas fa-credit-card"></i>
-                <div class="payment-details">
-                    <p class="name">Razorpay</p>
-                    <p>Pay securely with Razorpay</p>
+
+                            </label>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+
+                {% if available_coupons %}
+    <div class="coupon-list-container">
+        <h3 class="coupon-title">🎉 Available Coupons for You</h3>
+        <ul class="coupon-list">
+            {% for coupon in available_coupons %}
+                <li class="coupon-item">
+                    <div class="coupon-info">
+                        <span class="coupon-code">{{ coupon.code }}</span> 
+                        - <strong>{{ coupon.discount_percentage }}% off</strong>  
+                        (Min: ₹{{ coupon.min_amount }}, Max: ₹{{ coupon.max_discount }})
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
     </div>
-</div>
+{% else %}
+    <p class="no-coupon-message">🚫 No available coupons at the moment.</p>
+{% endif %}
+
 
 <!-- Order Summary Section -->
-<div class="order-summary-section" id="order-summary" style="display: none;">
-    <div class="checkout-card">
-        <div class="section-heading">Order Summary</div>
-        
-        {% for item in cart_items %}
-        <div class="order-item">
-            <div class="order-details">
-                <h4>{{ item.product.name }}</h4>
-                <p class="order-quantity">Quantity: {{ item.quantity }}</p>
-            </div>
-            <div class="order-price">{{ item.product.price }}</div>
-        </div>
-        {% endfor %}
-
-        <div class="order-summary">
-            <div class="summary-row">
-                <span>Subtotal</span>
-                <span>{{ subtotal }}</span>
-            </div>
-            {% if savings %}
-            <div class="summary-row">
-                <span>Savings</span>
-                <span>-{{ savings }}</span>
-            </div>
-            {% endif %}
-            <div class="summary-row total">
-                <span>Total</span>
-                <span>{{ estimated_total }}</span>
-            </div>
-        </div>
-
-        <button type="submit" id="place-order-btn" class="place-order-btn" style="display: none;">Place Order</button>
-        <a href="{% url 'payments:checkout_razorpay' %}">
-            <button type="button" class="razorpay-btn">Proceed to Pay</button>
-        </a>
-
+<div class="checkout-card">
+    <div class="section-heading">
+        <i class="fas fa-shopping-cart"></i> Order Summary
     </div>
+
+    <table class="order-summary-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>₹{{ item.product.price }}</td>
+                <td>₹{{ item.product.price|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <hr>
+
+   <!-- Price Breakdown -->
+<div class="price-breakdown">
+    <p>Subtotal: <span id="subtotal-amount">₹{{ subtotal|floatformat:2 }}</span></p>
+
+    <!-- Discount row (hidden initially if no coupon applied) -->
+    <p class="discount" id="discount-row" style="display: {% if applied_coupon %}block{% else %}none{% endif %};">
+        Discount (<span id="coupon-code-text">{% if applied_coupon %}{{ applied_coupon.code }}{% endif %}</span>):
+        <span id="discount-amount">- ₹{{ discount_amount|floatformat:2 }}</span>
+    </p>
+
+    <hr>
+
+    <!-- Total amount after discount -->
+    <p class="total">Total: <span id="total-amount">₹{{ total|default:0|floatformat:2 }}</span></p>
+
+    <!-- Final Total Amount (updated after coupon application) -->
+    <p class="final-total">Final Total: <span id="final-total-amount">₹{{ total|default:0|floatformat:2 }}</span></p>
 </div>
+
+<!-- Coupon Code Section -->
+<div class="coupon-section">
+    <label for="coupon-code">Have a Coupon? Enter Code:</label>
+    <input type="text" id="coupon-code" class="coupon-input" placeholder="Enter Coupon Code">
+    <button type="button" class="apply-coupon-btn">Apply Coupon</button>
+    <p id="coupon-message" style="color: red; margin-top: 5px;"></p> <!-- Message display -->
+</div>
+
+<!-- CSRF Token for Fetch Request -->
+<input type="hidden" id="csrf-token" value="{{ csrf_token }}">
+            
+                      <!-- Payment Button Section -->
+                    <button type="submit" id="place-order-btn" class="place-order-btn">Place Order</button>
+                    <div id="razorpay-btn-section" style="display: none;">
+                        <button type="button" id="proceed-to-pay" class="razorpay-btn">Proceed to Pay</button>
+                    </div>
+                </div>
 
 <script>
 
+    document.addEventListener("DOMContentLoaded", function() {
+        console.log("✅ JavaScript Loaded Successfully!");
+
+        console.log(document.getElementById("total-amount"));
+        console.log(document.getElementById("total-amount").innerText);
+        
+        let applyCouponButton = document.querySelector(".apply-coupon-btn");
+        if (applyCouponButton) {
+            applyCouponButton.addEventListener("click", applyCoupon);
+        } else {
+            console.error("❌ Error: Apply Coupon button not found.");
+        }
+    });
     
+    function applyCoupon() {
+        console.log("📢 Apply Coupon button clicked!");
+    
+        let couponInput = document.getElementById("coupon-code");
+        let totalAmountElement = document.getElementById("total-amount");  // ✅ Declare only once
+        let finalTotalAmountElement = document.getElementById("final-total-amount");  // Get final total element
+        let messageElement = document.getElementById("coupon-message");
+    
+        if (!couponInput || !totalAmountElement || !messageElement || !finalTotalAmountElement) {
+            console.error("❌ Error: Required elements not found.");
+            return;
+        }
+    
+        let couponCode = couponInput.value.trim();
+        let totalText = totalAmountElement.innerText.replace(/[^\d.]/g, "").trim();
+        let totalAmount = parseFloat(totalText);
+    
+        console.log("📢 Extracted Total Amount:", totalAmount);
+    
+        if (isNaN(totalAmount) || totalAmount <= 0) {
+            console.error("❌ Invalid total amount detected:", totalText);
+            messageElement.innerText = "❌ Invalid total amount.";
+            return;
+        }
+    
+        fetch("{% url 'apply_coupon' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({
+                code: couponCode,
+                total_amount: totalAmount
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("📢 Server Response:", data);
+    
+            if (data.success) {
+                messageElement.style.color = "green";
+                messageElement.innerText = `🎉 Coupon Applied! Discount: ₹${data.discount_amount}`;
+    
+                let finalTotal = parseFloat(data.final_total);
+                if (isNaN(finalTotal)) {
+                    console.error("❌ Error: Invalid final_total value received:", data.final_total);
+                    return; // Stop execution if the value is invalid
+                }
+    
+                // Update the total amount and final total amount
+                totalAmountElement.innerText = `₹${finalTotal.toFixed(2)}`;
+                finalTotalAmountElement.innerText = `₹${finalTotal.toFixed(2)}`;  // Update final total amount element
+    
+            } else {
+                messageElement.style.color = "red";
+                messageElement.innerText = `❌ ${data.error}`;
+            }
+        })
+        .catch(error => {
+            console.error("❌ Fetch Error:", error);
+            messageElement.style.color = "red";
+            messageElement.innerText = "❌ Error applying coupon. Please try again.";
+        });
+    }
+    
+    
+    
+
+
+    // Payment Method Selection
 document.querySelectorAll('.payment-option').forEach(option => {
-    option.addEventListener('click', () => {
+    option.addEventListener('click', (event) => {
+        // Remove 'selected' class from all options
         document.querySelectorAll('.payment-option').forEach(opt => {
             opt.classList.remove('selected');
+            opt.querySelector('input[type="radio"]').checked = false; // Uncheck all
         });
+
+        // Add 'selected' class to the clicked option
         option.classList.add('selected');
-        option.querySelector('input[type="radio"]').checked = true;
-        
-        const orderSummary = document.getElementById('order-summary');
-        const placeOrderBtn = document.getElementById('place-order-btn');
-        const razorpayBtn = document.getElementById('razorpay-btn');
-        
-        if (option.id === 'cod-option') {
-            orderSummary.style.display = 'block';
-            placeOrderBtn.style.display = 'block';
-            razorpayBtn.style.display = 'none';
-        } else if (option.id === 'razorpay-option') {
-            orderSummary.style.display = 'block';
-            placeOrderBtn.style.display = 'none';
-            razorpayBtn.style.display = 'block';
+        let radioInput = option.querySelector('input[type="radio"]');
+        radioInput.checked = true; // Ensure the radio button is checked
+
+        // Show/hide Razorpay button based on selection
+        const razorpayBtnSection = document.getElementById('razorpay-btn-section');
+        if (radioInput.value === 'cod') {
+            razorpayBtnSection.style.display = 'none';
+        } else if (radioInput.value === 'razorpay') {
+            razorpayBtnSection.style.display = 'block';
         }
     });
 });
-</script>
 
+    // Proceed to Pay Button Click Event
+    document.getElementById("proceed-to-pay").addEventListener("click", function () {
+        let csrfTokenElement = document.querySelector("#checkout-form input[name=csrfmiddlewaretoken]");
+        let csrfToken = csrfTokenElement ? csrfTokenElement.value : null;
+        let addressId = document.querySelector('input[name="address_id"]:checked')?.value;
+
+        if (!csrfToken) {
+            console.error("CSRF token not found!");
+            alert("CSRF token missing. Please refresh the page and try again.");
+            return;
+        }
+
+        if (!addressId) {
+            console.error("No address selected.");
+            alert("Please select an address.");
+            return;
+        }
+
+        // Send POST request to create Razorpay order
+        fetch("{% url 'payments:checkout_razorpay' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                address_id: addressId,  // Send address ID
+                // Add other necessary data, like cart items, subtotal, etc.
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "error") {
+                alert(data.message);
+            } else {
+                // Razorpay order is created successfully, proceed to payment page
+                window.location.href = "{% url 'payments:pay' %}";
+            }
+        })
+        .catch(error => {
+            console.error("Fetch Error:", error);
+            alert("An error occurred. Please try again.");
+        });
+    });
+</script>
 {% endblock %}

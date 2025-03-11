@@ -74,9 +74,10 @@
         
         {% if order.payment_status == 'Failure' %}
             <p>Payment Status: <span style="color: red;">{{ order.status }}</span></p>
-        {% else %}
-            <p>Payment Status: {{ order.status}}</p>
+        {% comment %} {% else %}
+            <p>Payment Status: {{ order.status}}</p> {% endcomment %}
         {% endif %}
+       
         
         <h5>Order Items:</h5>
         <table class="table">
@@ -96,20 +97,25 @@
                       <td>{{ item.product.name }}</td>
                       <td>{{ item.quantity }}</td>
                       <td>₹{{ item.price }}</td>
-                      <td>{{ item.order.status }}</td>
+                      {% if item.status == "Cancelled" %}
+                      <span class="cancelled-label"><td>{{ item.status }}</td>Cancelled</span>
+                      {% else %}
+                      <td>{{ item.status }}</td>
                       <td>
                         <form method="POST">
                           {% csrf_token %}
-                          <input type="hidden" name="item_id" value="">
-                          <select name="new_status" class="form-select" onchange="this.form.submit()">
-                              <option value="" disabled selected>Change Order Status</option>
-                              <option value="Pending" {% if order.status == 'Pending' %} selected {% endif %}>Pending</option>
-                              <option value="Shipped" {% if order.status == 'Shipped' %} selected {% endif %}>Shipped</option>
-                              <option value="Delivered" {% if order.status == 'Delivered' %} selected {% endif %}>Delivered</option>
+                          <input type="hidden" name="item_id" value="{{ item.id }}">
+                          <select name="new_status">
+                              <option value="Pending" {% if item.status == "Pending" %}selected{% endif %}>Pending</option>
+                              <option value="Shipped" {% if item.status == "Shipped" %}selected{% endif %}>Shipped</option>
+                              <option value="Delivered" {% if item.status == "Delivered" %}selected{% endif %}>Delivered</option>
+                              <option value="Returned" {% if item.status == "Returned" %}selected{% endif %}>Returned</option>
                           </select>
+                          <button type="submit">Update</button>
                       </form>
                       </td>
                   </tr>
+                  {% endif %}
               {% endfor %}
           {% else %}
               <tr>
@@ -117,6 +123,7 @@
               </tr>
           {% endif %}
           </tbody>
+          
           
           
         </table>

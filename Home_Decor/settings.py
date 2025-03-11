@@ -55,7 +55,10 @@ INSTALLED_APPS = [
     'cart',
     'address',
     'orders',
-    'payments'
+    'payments',
+    'coupons',
+    'wallet'
+    # 'coupons.apps.CouponsConfig', 
 ]
 
 MIDDLEWARE = [
@@ -179,11 +182,13 @@ EMAIL_HOST_PASSWORD ='dfwm wgbk ggdk jjpx'  # home@@decor123
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
-SESSION_COOKIE_AGE = 300  # Session expires after 5 minutes (300 seconds)
+SESSION_COOKIE_AGE = 3600  # Session expires after 5 minutes (300 seconds)
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = 3600  # Enable HTTP Strict Transport Security (HSTS)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
 
 AUTHENTICATION_BACKENDS = [
     # Needed to login by username in Django admin, regardless of `allauth`
@@ -225,9 +230,12 @@ LOGGING = {
     },
 }
 
-RAZORPAY_KEY_ID = "rzp_test_ew1QKEtTjY5hso"
-RAZORPAY_SECRET_KEY = "C3n7YFFeKcZi1cVszrKlRrNU"
+RAZORPAY_KEY_ID = "rzp_test_z5phDVFjobwi4y"
+RAZORPAY_SECRET_KEY = "dEZsZSFZHP8NKZ2BFKX3SrSH"
 
 import razorpay
 
-client = razorpay.Client(auth=("rzp_test_ew1QKEtTjY5hso", "C3n7YFFeKcZi1cVszrKlRrNU"))
+# client = razorpay.Client(auth=("rzp_test_ew1QKEtTjY5hso", "C3n7YFFeKcZi1cVszrKlRrNU"))
+
+SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SECURE = True

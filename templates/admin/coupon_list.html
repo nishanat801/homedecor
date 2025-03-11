@@ -1,0 +1,290 @@
+
+{% extends "base.html" %}
+{% block content %}
+<title>Coupon Management</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background-color: #f5f5f5;
+        padding: 20px;
+    }
+
+   
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .page-title {
+        font-size: 24px;
+        color: #333;
+        font-weight: bold;
+    }
+
+    .add-button {
+        padding: 10px 15px;
+        background-color: #4a90e2;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .add-button:hover {
+        background-color: #357abd;
+    }
+
+    .filters {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .search-box input {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        width: 250px;
+        font-size: 14px;
+    }
+
+    .status-filter select {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    th, td {
+        padding: 14px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+
+    th {
+        background-color: #a57256;
+        font-weight: 600;
+        color: white;
+        {% comment %} font-size: 14px; {% endcomment %}
+    }
+
+    td {
+        font-size: 14px;
+        color: #333;
+    }
+
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    .status-active {
+        background-color: #e6f4ea;
+        color: #137333;
+    }
+
+    .status-expired {
+        background-color: #fce8e6;
+        color: #c5221f;
+    }
+
+    .actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+        border: none;
+        text-decoration: none;
+    }
+
+    .btn-edit {
+        background-color: #f8f9fa;
+        color: #4a90e2;
+    }
+
+    .btn-edit:hover {
+        background-color: #e9ecef;
+    }
+
+    .btn-delete {
+        background-color: #fce8e6;
+        color: #c5221f;
+    }
+
+    .btn-delete:hover {
+        background-color: #f8d7da;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px;
+        border-top: 1px solid #eee;
+    }
+
+    .page-info {
+        font-size: 14px;
+        color: #666;
+    }
+
+    .page-numbers {
+        display: flex;
+        gap: 8px;
+    }
+
+    @media (max-width: 768px) {
+        .filters {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .search-box {
+            width: 100%;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+    }
+</style>
+
+<div class="container">
+    <div class="header">
+        <h1 class="page-title">Coupon Management</h1>
+        <a href="{% url 'add_coupon' %}" class="add-button">+ Add New Coupon</a>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+        <div class="search-box">
+            <input type="text" id="search" placeholder="Search by coupon code...">
+        </div>
+        <div class="status-filter">
+            <select id="filter">
+                <option value="all">All Coupons</option>
+                <option value="active">Active</option>
+                <option value="expired">Expired</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Coupon Table -->
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Coupon Name</th>
+                    <th>Code</th>
+                    <th>Type</th>
+                    <th>Discount</th>
+                    <th>Min Amount</th>
+                    <th>Max Amount</th>
+                    <th>Expiry Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for coupon in coupons %}
+                <tr>
+                    <td>{{ coupon.name }}</td>
+                    <td>{{ coupon.code }}</td>
+                    <td>{{ coupon.get_coupon_type_display }}</td>
+                    <td>
+                        {% if coupon.coupon_type == "percentage" %}
+                            {{ coupon.discount_percentage }}%
+                        {% else %}
+                            {{ coupon.discount_percentage }}%
+                        {% endif %}
+                    </td>
+                    <td>₹{{ coupon.min_amount }}</td>
+                    <td>₹{{ coupon.max_discount }}</td>
+                    <td>{{ coupon.expiry_date|date:"Y-m-d" }}</td>
+                    <td>
+                        <span class="status-badge {% if coupon.expiry_date >= today %}status-active{% else %}status-expired{% endif %}">
+                            {% if coupon.expiry_date >= today %}Active{% else %}Expired{% endif %}
+                        </span>
+                    </td>
+                    <td class="actions">
+                        <a href="{% url 'edit_coupon' coupon.id %}" class="btn btn-edit">Edit</a>
+                        <form action="{% url 'delete_coupon' coupon.id %}" method="POST" onsubmit="return confirm('Are you sure you want to delete this coupon?')">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 20px; color: #888;">No coupons available.</td>
+                </tr>
+                {% endfor %}
+                
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Ensure today is passed correctly to JavaScript
+        var today = new Date().toISOString().split("T")[0]; // today's date in YYYY-MM-DD format
+        const searchInput = document.getElementById("search");
+        const filterSelect = document.getElementById("filter");
+        const tableRows = document.querySelectorAll("tbody tr");
+
+        function filterCoupons() {
+            const searchText = searchInput.value.toLowerCase();
+            const filterValue = filterSelect.value;
+
+            tableRows.forEach(row => {
+                const couponCode = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
+                const expiryDateText = row.querySelector("td:nth-child(7)").textContent.trim(); // Get expiry date
+                const expiryDate = new Date(expiryDateText).toISOString().split("T")[0]; // Convert to YYYY-MM-DD
+
+                const isActive = expiryDate >= today; // Compare expiry date
+
+                let matchesSearch = couponCode.includes(searchText);
+                let matchesFilter = filterValue === "all" || 
+                                    (filterValue === "active" && isActive) || 
+                                    (filterValue === "expired" && !isActive);
+
+                if (matchesSearch && matchesFilter) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+
+        searchInput.addEventListener("input", filterCoupons);
+        filterSelect.addEventListener("change", filterCoupons);
+    });
+</script>
+{% endblock %}

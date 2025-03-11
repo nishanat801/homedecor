@@ -10,6 +10,8 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     otp = models.CharField(max_length=6, blank=True, null=True)  # Field for storing OTP
     otp_expiry = models.DateTimeField(null=True, blank=True)  # Field for storing OTP
+    
+    
 
     # Add related_name to avoid conflicts
     groups = models.ManyToManyField(

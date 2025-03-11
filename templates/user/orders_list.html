@@ -6,144 +6,152 @@
  <style>
    
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
 
-    .order-card {
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-      margin-bottom: 20px;
-      transition: transform 0.3s ease-in-out;
-    }
+.order-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease-in-out;
+}
 
-    .order-card:hover {
-      transform: scale(1.02);
-    }
+.order-card:hover {
+    transform: scale(1.02);
+}
 
-    h3, h4 {
-      color: #333;
-      margin-bottom: 10px;
-    }
+h3, h4 {
+    color: #333;
+    margin-bottom: 10px;
+}
 
-    p {
-      color: #555;
-      margin: 5px 0;
-    }
+p {
+    color: #555;
+    margin: 5px 0;
+}
 
-    .order-details, .shipping-address, .items {
-      padding: 15px 0;
-      border-bottom: 1px solid #ddd;
-    }
+.items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 15px 0;
+}
 
-    .items ul {
-      list-style: none;
-      padding: 0;
-      display: flex;
-      gap: 20px;
-      overflow-x: auto;
-    }
+.items li {
+    list-style: none;
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    width: 220px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
-    .items li {
-      flex: 0 0 auto;
-      background: #f1f1f1;
-      padding: 15px;
-      border-radius: 8px;
-      text-align: center;
-      min-width: 200px;
-    }
+.items img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+    display: block;
+    margin: 0 auto 10px;
+}
 
-    .items img {
-      width: 100px;
-      height: auto;
-      border-radius: 5px;
-    }
+.cancel-btn, .reorder-btn,.return-button {
+    background-color: red;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+    display: block;
+    width: 100%;
+    border-radius: 5px;
+}
 
-    .no-orders {
-      text-align: center;
-      color: #999;
-      font-size: 18px;
-      margin-top: 50px;
-    }
+.cancel-btn:hover {
+    background-color: darkred;
+}
 
-    .cancel-btn {
-      background-color: red;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      cursor: pointer;
-      margin-top: 10px;
-  }
-  .cancel-btn:hover {
-      background-color: darkred;
-  }
+.reorder-btn {
+    background-color: green;
+}
 
-  .cancelled-label {
+.reorder-btn:hover {
+    background-color: darkgreen;
+}
+.return-button {
+    background-color:green;
+}
+
+.cancelled-label {
     color: red;
     font-weight: bold;
+    display: block;
+    margin-top: 10px;
 }
-  </style>
+
+.no-orders {
+    text-align: center;
+    color: #999;
+    font-size: 18px;
+    margin-top: 50px;
+}
+</style>
 </head>
 <body>
-  <div class="container">
-    {% for order in orders %}
-    <div class="order-card">
-        <h3>Order #{{ order.order_number }}</h3>
-        <div class="order-details">
-            <p><strong>Order Date:</strong> {{ order.order_date }}</p>
-            <p><strong>Status:</strong> {{ order.status }}</p>
-            <p><strong>Total Price:</strong> {{ order.total_price }}</p>
-            <p><strong>Estimated Delivery:</strong> {{ order.estimated_delivery }}</p>
-        </div>
-    
-        <div class="shipping-address">
-            <h4>Shipping Address</h4>
-            <p>{{ order.address.full_name }}</p>
-            <p>{{ order.address.address_line_1 }}</p>
-            <p>{{ order.address.city }}</p>
-        </div>
-    
-        <div class="items">
-            <h4>Items</h4>
-            <ul>
+    <div class="container">
+        {% for order in orders %}
+        <div class="order-card">
+            <h3>Order #{{ order.order_number }}</h3>
+            <ul class="items">
                 {% for item in order.items %}
                 <li>
-                    <img src="{{ item.product_images.0 }}" alt="Product Image" style="width: 100px; height: auto;">
+                    <img src="{{ item.product_image }}" alt="{{ item.product_name }}">
                     <p><strong>{{ item.product_name }}</strong></p>
                     <p>Quantity: {{ item.quantity }}</p>
                     <p>Price: {{ item.price }}</p>
+                    <p>Status: <span class="order-status">{{ item.status }}</span></p>  <!-- ✅ Status updates dynamically -->
+    
+                    {% if item.status == "Cancelled"%}
+                        <span class="cancelled-label">Cancelled</span>
+                        <form action="{% url 'orders:reorder_item' item.id %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="reorder-btn">Order Again</button>
+
+                            {% elif item.status == "Delivered" %}
+                            <form action="{% url 'orders:return_product' item.id %}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="return-button" data-item-id="{{ item.id }}">Request Return</button>
+                            </form>
+
+                            {% elif item.status == "Requested for Return" %}
+                                <span class="return-requested-label">Return Requested</span>
+                                {% elif item.status == "Returned" %}
+                                <!-- Show "Order Again" button for returned items -->
+                                <form action="{% url 'orders:reorder_item' item.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" class="reorder-btn">Order Again</button>
+                                </form>
+    
+                                {% else %}
+                                <form action="{% url 'orders:cancel_order' item.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" class="cancel-btn">Cancel Item</button>
+                                </form>
+                                {% endif %}
                 </li>
                 {% endfor %}
-            </ul>
-        </div>
-    
-        {% if order.id %}
-        <form action="{% url 'orders:cancel_order' order.id %}" method="POST">
-            {% csrf_token %}
-            <button type="submit" class="cancel-btn">Cancel Order</button>
-        </form>
-    {% else %}
-        <p>Error: Order ID is missing.</p>
-    {% endif %}
-
-
-    <div class="order-details">
-          {% if order.status == "cancelled" %}
-              <span class="cancelled-label">Cancelled</span>
-          {% else %}
-              {{ order.status }}
-          {% endif %}
-  </div>
-
-    </div>
-    {% empty %}
+    </ul>
+</div>
+{% empty %}
     <p class="no-orders">No orders found.</p>
-    {% endfor %}
-    
-  </div>
+{% endfor %}
+</div>
   {% if messages %}
 <div class="messages">
     {% for message in messages %}
@@ -152,5 +160,119 @@
 </div>
 {% endif %}
 </body>
-</html>
+
+
+<script>
+    {% comment %} function returnProduct(orderItemId) {
+        if (confirm("Are you sure you want to return this product?")) {
+            fetch(`/return-product/${orderItemId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Product return request submitted!");
+                    location.reload();
+                } else {
+                    alert("Error: " + data.error);
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Failed to process return request.");
+            });
+        }
+    } {% endcomment %}
+
+
+    document.querySelectorAll(".cancel-btn").forEach((button) => {
+        button.addEventListener("click", function (event) {
+            event.preventDefault();
+    
+            let confirmCancel = confirm("Are you sure you want to cancel this product?");
+            if (!confirmCancel) return;
+    
+            let form = this.closest("form");
+            let url = form.action;
+            let statusElement = form.closest("li").querySelector(".order-status"); 
+            let returnButton = form.closest("li").querySelector(".return-button"); 
+    
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": form.querySelector("input[name='csrfmiddlewaretoken']").value,
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Product has been cancelled successfully!");
+                    
+                    statusElement.textContent = "Cancelled";
+                    statusElement.classList.add("cancelled-label");
+    
+                    // ✅ Hide cancel button after cancellation
+                    form.querySelector(".cancel-btn").style.display = "none";
+    
+                    // ✅ Hide return button (Cancelled items can't be returned)
+                    if (returnButton) returnButton.style.display = "none";
+                } else {
+                    alert("Error: " + data.error);
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Failed to cancel the order.");
+            });
+        });
+    });
+    
+    document.querySelectorAll(".return-button").forEach((button) => {
+        button.addEventListener("click", function (event) {
+            event.preventDefault();
+    
+            let confirmReturn = confirm("Are you sure you want to request a return for this product?");
+            if (!confirmReturn) return;
+    
+            let itemElement = this.closest("li");
+            let statusElement = itemElement.querySelector(".order-status"); // Find the status text
+            let itemId = this.dataset.itemId;  // Get the item ID
+    
+            fetch(`/return-product/${itemId}/`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",  // Ensure CSRF token is correctly passed
+                },
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Server responded with an error: " + response.statusText);
+                }
+                return response.json();  // Parse the response body if successful
+            })
+            .then(data => {
+                if (data.success) {
+                    alert("Return request submitted successfully!");
+    
+                    // ✅ Update Status Text to "Requested for Return"
+                    statusElement.textContent = "Requested for Return";
+                    statusElement.classList.add("return-requested");
+    
+                    // ✅ Change Button Text to "Return Requested" and Disable It
+                    this.textContent = "Return Requested";
+                    this.disabled = true;
+                } else {
+                    alert("Error: " + data.error);  // Display error message from server if available
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Failed to process return request. Error: " + error.message);  // Improved error message
+            });
+        });
+    });
+</script>
 {% endblock%}

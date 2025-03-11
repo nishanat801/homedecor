@@ -19,6 +19,9 @@ import random
 from django.utils import timezone
 from datetime import timedelta
 logger = logging.getLogger(__name__)
+from coupons.models import Coupon
+from datetime import date, timedelta
+
 
 
 
@@ -120,6 +123,8 @@ def otp_verify_view(request):
             user.otp_expiry = None
             user.save()
 
+
+            
             # Clear session
             del request.session['email']
 

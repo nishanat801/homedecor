@@ -186,9 +186,12 @@
       <div class="container">
         <a href="{% url 'products_user' %}" class="logo">HomeDecor</a>
         <div class="search-bar">
-          <input type="text" placeholder="What are you looking for?">
-          <button type="submit">🔍</button>
-        </div>
+          <input type="text" id="searchInput" placeholder="What are you looking for?">
+          <button type="submit" id="searchButton">🔍</button>
+      </div>
+      
+     
+
         <div class="icons">
           <a href="{% url 'wishlist' %}" class="icon">❤️</a>
           <div class="dropdown">
@@ -201,6 +204,7 @@
             </div>
           </div>
           <a href={% url 'cart' %} class="icon">🛒</a>
+          <a href={% url 'Authentication:logout_user' %} class="icon">Login</a>
         </div>
       </div>
     </header>
@@ -215,14 +219,25 @@
           <li><a href="#">Clearance Sale</a></li>
         </ul>
       </nav>
-
+      {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+      
     <!-- Content (Add your main content here) -->
     <main style="padding: 20px;">
-        {% block content %}
+      
+      {% block content %}
         <!-- Main content will be rendered here -->
         {% endblock %}
     </main>
 
+    
     <!-- Footer -->
     <footer>
       <div class="footer-container">
@@ -258,5 +273,38 @@
       </div>
     </footer>
   </div>
+
+  <script>
+    document.getElementById("searchInput").addEventListener("input", function() {
+        let query = this.value;
+        
+        // Only search if the query length is greater than 2 characters
+        if (query.length > 2) {
+            fetch(`/search_products/?query=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                let resultDiv = document.getElementById("searchResults");
+                resultDiv.innerHTML = "";  // Clear previous results
+    
+                if (data.products.length > 0) {
+                    data.products.forEach(product => {
+                        resultDiv.innerHTML += `
+                            <div class="product-item">
+                                <img src="${product.image}" alt="${product.name}" width="100">
+                                <h4>${product.name}</h4>
+                                <p>₹${product.price}</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    resultDiv.innerHTML = "<p>No products found.</p>";
+                }
+            })
+            .catch(error => console.error('Error fetching products:', error));
+        } else {
+            document.getElementById("searchResults").innerHTML = "";  // Clear results if search is too short
+        }
+    });
+    </script>
 </body>
 </html>

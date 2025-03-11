@@ -13,6 +13,8 @@ urlpatterns = [
     path('products/user/', views.category_with_products, name='products_user'),
     path('<int:category_id>/', views.category_with_products, name='category_products'),
 
+    path("search_products/", views.search_products, name="search_products"),
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -17,7 +17,15 @@
     {% else %}
     <p>No default address set. Please add an address.</p>
     {% endif %}
-
+    
+    {% if messages %}
+    <div class="message-container">
+        {% for message in messages %}
+        <p class="error-message">{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
     <!-- "See More" Button -->
     {% if remaining_addresses %}
     <button id="see-more-btn" onclick="toggleAddresses(event)">See More</button>

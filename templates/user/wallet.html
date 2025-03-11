@@ -1,0 +1,104 @@
+{% extends 'header_footer.html' %}
+
+{% block title %}Order Summary - Checkout - Home Decor{% endblock %}
+
+{% block content %}
+    
+{% load static %}
+
+<style>
+    {% comment %} body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f7f6;
+        margin: 0;
+        padding: 20px;
+    } {% endcomment %}
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        font-size: 28px;
+        color: #333;
+        margin-bottom: 20px;
+    }
+    .balance {
+        font-size: 24px;
+        font-weight: bold;
+        color: #4CAF50;
+    }
+    .transaction-history {
+        margin-top: 30px;
+    }
+    .transaction-history h2 {
+        font-size: 22px;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    .transaction-list {
+        list-style-type: none;
+        padding: 0;
+    }
+    .transaction-list li {
+        background-color: #f9f9f9;
+        padding: 12px;
+        margin: 10px 0;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .transaction-list .credit {
+        color: green;
+        font-weight: bold;
+    }
+    .transaction-list .debit {
+        color: red;
+        font-weight: bold;
+    }
+    .transaction-date {
+        font-size: 14px;
+        color: #999;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>My Wallet</h1>
+
+{% if wallet %}
+    <p class="balance">Available Balance: ₹{{ wallet.balance }}</p>
+{% else %}
+    <p>No wallet found. Please contact support.</p>
+{% endif %}
+
+<div class="transaction-history">
+    <h2>Transaction History</h2>
+    <ul class="transaction-list">
+        {% if transactions %}
+            {% for transaction in transactions %}
+                <li>
+                    <div>
+                        <span class="transaction-date">{{ transaction.date|date:"M d, Y h:i A" }}</span>
+                        <span class="transaction-description">{{ transaction.description }}</span>
+                    </div>
+                    <span class="{% if transaction.transaction_type == 'credit' %}credit{% else %}debit{% endif %}">
+                        ₹{{ transaction.amount }}
+                    </span>
+                </li>
+            {% endfor %}
+        {% else %}
+            <li>No transactions yet.</li>
+        {% endif %}
+    </ul>
+</div>
+</div>
+
+</body>
+{% endblock%}

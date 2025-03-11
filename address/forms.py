@@ -3,11 +3,11 @@ from .models import Address
 import re
 
 class AddressForm(forms.ModelForm):
-    is_default = forms.BooleanField(required=False, label="Make Default Address") 
+    # is_default = forms.BooleanField(required=False, label="Make Default Address") 
 
     class Meta:
         model = Address
-        fields = ['full_name', 'phone_number', 'pincode', 'address', 'city', 'state', 'address_type','is_default']
+        fields = ['full_name', 'phone_number', 'pincode', 'address', 'city', 'state', 'address_type']
         
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

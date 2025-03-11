@@ -22,7 +22,7 @@
         flex-wrap: wrap;
         gap: 20px;
         justify-content: space-between;
-    
+    }
     .wishlist-item {
         flex: 1 1 calc(33.333% - 20px); 
         max-width: calc(33.333% - 20px); 
@@ -95,7 +95,10 @@
                     <h3>{{ item.product.name }}</h3>
                     <p>{{ item.product.description }}</p>
                     <p>Price: {{ item.product.price }}</p>
-                    <a href="{% url 'remove_from_wishlist' item.product.id %}" class="remove-item">Remove</a>
+                    <a href="{% url 'remove_from_wishlist' item.product.id %}" class="remove-item">Remove</a><br>
+                    <a href="{% url 'add_to_cart' item.product.id %}" class="add-to-cart">Add to Cart</a>
+
+                   
                 </div>
             </div>
             {% endfor %}

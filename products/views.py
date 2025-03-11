@@ -9,6 +9,23 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 from django.contrib import messages
 
+def search_products(request):
+    query = request.GET.get('query', '').strip()
+
+    products = []
+    if query:
+        # Filter products based on the query (case-insensitive search)
+        products = Product.objects.filter(name__icontains=query)
+    
+    # Prepare product data to return
+    product_data = [
+        {"id": p.id, "name": p.name, "price": p.price, "image": p.image1.url}
+        for p in products
+    ]
+    
+    return JsonResponse({"products": product_data})
+
+
 def crop_resize_image(image, size=(300, 300)):
     """Resize and crop the image to the given size."""
     img = Image.open(image)
