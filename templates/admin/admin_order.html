@@ -84,12 +84,19 @@
       <div class="page-header">
         <h3 class="page-title text-black">Orders</h3>
       </div>
+
+       <!-- Search & Date Filter Form -->
+       <form method="GET" action="{% url 'orders:admin_orders' %}" class="search-form">
+        <input type="text" name="q" placeholder="Search by Username" value="{{ search_query }}">
+        <input type="date" name="date" value="{{ date_filter }}">
+        <button type="submit">Search</button>
+    </form>
   
       <div class="card dark-theme">
         <div class="card-body">
           <div class="table-responsive">
-            {% if orders %}
-              <p>Orders found: {{ orders.count }}</p>
+            {% if page_obj %}
+                        <p>Orders found: {{ page_obj.paginator.count }}</p>
               <table class="table table-dark">
                 <thead>
                   <tr>
@@ -116,6 +123,25 @@
                   {% endfor %}
                 </tbody>
               </table>
+<!-- Pagination -->
+<div class="pagination">
+  <span class="step-links">
+      {% if page_obj.has_previous %}
+          <a href="?page=1&q={{ search_query }}&date={{ date_filter }}">First</a>
+          <a href="?page={{ page_obj.previous_page_number }}&q={{ search_query }}&date={{ date_filter }}">Previous</a>
+      {% endif %}
+
+      <span class="current">
+          Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+      </span>
+
+      {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}&q={{ search_query }}&date={{ date_filter }}">Next</a>
+          <a href="?page={{ page_obj.paginator.num_pages }}&q={{ search_query }}&date={{ date_filter }}">Last</a>
+      {% endif %}
+  </span>
+</div>
+
             {% else %}
               <p>No orders available.</p>
             {% endif %}

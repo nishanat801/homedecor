@@ -56,23 +56,20 @@ h1 {
 <h1>Edit Product</h1>
 <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
-    
+
     <label for="name">Product Name</label>
     <input type="text" id="name" name="name" value="{{ product.name }}" required>
 
     <label for="price">Price</label>
-    <input type="number" id="price" name="price" value="{{ product.price }}" required>
+    <input type="number" id="price" name="price" min="0.01" step="0.01" value="{{ product.price }}" required>
 
     <label for="stock">Stock</label>
-    <input type="number" id="stock" name="stock" value="{{ product.stock }}" required>
+<input type="number" id="stock" name="stock" min="0" value="{{ product.stock }}" required>
 
     <label for="category">Category</label>
-    <select id="category" name="category">
-        <option value="" disabled>Select a category</option>
+    <select id="category" name="category" required>
         {% for category in categories %}
-            <option value="{{ category.id }}" {% if product.category.id == category.id %}selected{% endif %}>
-                {{ category.name }}
-            </option>
+            <option value="{{ category.id }}" {% if category.id == product.category.id %}selected{% endif %}>{{ category.name }}</option>
         {% endfor %}
     </select>
 
@@ -81,35 +78,65 @@ h1 {
 
     <h3>Attributes</h3>
 
-    <!-- Display current attributes -->
-    <label>Current Colors:</label>
-    <ul>
-        {% for attribute in product.attributes.all %}
-            {% if attribute.attribute_type == 'color' %}
-                <li>{{ attribute.value }}</li>
-            {% endif %}
-        {% endfor %}
-    </ul>
+    <!-- Colors -->
+    <label for="colors">Colors (comma-separated)</label>
+    <input type="text" id="colors" name="colors" value="{{ existing_colors }}" placeholder="Enter colors, e.g., red, blue">
 
-    <label for="colors">Add/Update Colors (comma-separated)</label>
-    <input type="text" id="colors" name="colors">
+    <!-- Materials -->
+    <label for="materials">Materials (comma-separated)</label>
+    <input type="text" id="materials" name="materials" value="{{ existing_materials }}" placeholder="Enter materials, e.g., cotton, plastic">
 
-    <label for="materials">Add/Update Materials (comma-separated)</label>
-    <input type="text" id="materials" name="materials">
+    <!-- Sizes -->
+    <label for="sizes">Sizes (comma-separated)</label>
+    <input type="text" id="sizes" name="sizes" value="{{ existing_sizes }}" placeholder="Enter sizes, e.g., S, M, L">
 
-    <label for="sizes">Add/Update Sizes (comma-separated)</label>
-    <input type="text" id="sizes" name="sizes">
-
+    <h3>Current Images</h3>
     <label for="image1">Image 1</label>
-    <input type="file" id="image1" name="image1">
+    <input type="file" id="image1" name="image1" data-filename="{{ product.image1.name }}">
+    <span>{{ product.image1.name }}</span>
 
     <label for="image2">Image 2</label>
-    <input type="file" id="image2" name="image2">
+    <input type="file" id="image2" name="image2" data-filename="{{ product.image2.name }}">
+    <span>{{ product.image2.name }}</span>
 
     <label for="image3">Image 3</label>
-    <input type="file" id="image3" name="image3">
+    <input type="file" id="image3" name="image3" data-filename="{{ product.image3.name }}">
+    <span>{{ product.image3.name }}</span>
 
-    <button type="submit">Save Changes</button>
+   
+
+    <button type="submit">Update Product</button>
 </form>
 
+<script>
+    document.querySelector("form").addEventListener("submit", function(event) {
+        let price = document.getElementById("price").value;
+        let stock = document.getElementById("stock").value;
+    
+        if (price <= 0 || stock < 0) {
+            event.preventDefault(); // Prevent form submission
+            alert("Price and Stock must be positive numbers.");
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        function updateFileName(input) {
+            if (input.files.length > 0) {
+                input.nextElementSibling.innerText = input.files[0].name; // Set label text to file name
+            }
+        }
+
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', function () {
+                updateFileName(this);
+            });
+
+            // Show existing image name if already uploaded
+            let fileName = input.getAttribute('data-filename');
+            if (fileName) {
+                input.nextElementSibling.innerText = fileName;
+            }
+        });
+    });
+    </script>
 {% endblock %}

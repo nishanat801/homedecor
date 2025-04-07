@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Product, Cart,Wishlist
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 @login_required
 def cart_view(request):
@@ -22,6 +23,11 @@ def cart_view(request):
 @login_required
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
+
+    # ✅ Check if the product is in stock
+    if product.stock == 0:
+        messages.error(request, "This product is out of stock!")
+        return redirect('product_details', product_id=product.id)
     
     cart_item, created = Cart.objects.get_or_create(product=product, user=request.user)  # Assuming user is a field
     if not created:
@@ -36,7 +42,12 @@ def update_quantity(request, product_id, action):
     product = get_object_or_404(Product, id=product_id)
 
     if action == "increment":
-        if cart_item.quantity < product.stock:  # Check if stock is available
+        if cart_item.quantity >= 4:  # ✅ Limit to a maximum of 4 items
+            return JsonResponse({
+                "error": "You can't purchase more than 4 items of this product!",
+                "quantity": cart_item.quantity
+            })
+        elif cart_item.quantity < product.stock:  # ✅ Check stock availability
             cart_item.quantity += 1
             cart_item.save()
         else:
@@ -51,16 +62,15 @@ def update_quantity(request, product_id, action):
             cart_item.save()
         else:
             cart_item.delete()
-            return JsonResponse({"quantity": 0})  # Remove item if quantity reaches 0
+            return JsonResponse({"quantity": 0})  # ✅ Remove item if quantity reaches 0
 
-    # Calculate the total price for this product
+    # ✅ Calculate the total price for this product
     total_price = cart_item.product.price * cart_item.quantity
 
     return JsonResponse({
         "quantity": cart_item.quantity,
         "total_price": total_price
     })
-
 
 @login_required
 def remove_from_cart(request, product_id):

@@ -8,6 +8,9 @@ urlpatterns = [
     path('block/<int:user_id>/', views.block_user, name='block_user'),   # Block user
     path('unblock/<int:user_id>/', views.unblock_user, name='unblock_user'),  # Unblock user
     path('my_account/',views.my_account,name='my_account'),
+
+    path('edit-profile/', views.edit_profile, name='edit_profile'),
+    path('change-password/', views.change_password, name='change-password'),
     
     
     

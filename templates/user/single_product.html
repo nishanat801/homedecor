@@ -152,6 +152,7 @@
             gap: 20px;
             overflow-x: auto;
             padding-bottom: 10px;
+           
         }
 
         .product, .review {
@@ -161,6 +162,7 @@
             padding: 15px;
             flex: 0 0 300px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          
         }
 
         .product img {
@@ -278,6 +280,149 @@
         .main-image {
             cursor: zoom-in;
         }
+
+        
+        .customer-reviews {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 25px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+    
+        .customer-reviews h2 {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+    
+        .reviews {
+            margin-top: 20px;
+        }
+    
+        .review {
+            background: #f9f9f9;
+            padding: 15px;
+            border-left: 5px solid #007bff;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #222;
+            margin-bottom: 5px;
+        }
+    
+        .stars {
+            color: #FFD700;
+            font-size: 18px;
+        }
+    
+        .review-text {
+            color: #555;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+    
+        .review-date {
+            font-size: 14px;
+            color: #777;
+        }
+    
+        .no-reviews {
+            text-align: center;
+            font-style: italic;
+            color: #777;
+            margin-top: 15px;
+        }
+    
+        .review-form {
+            background: #f1f1f1;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    
+        .review-form button {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s ease;
+            width: 100%;
+            font-weight: 600;
+        }
+    
+        .review-form button:hover {
+            background: #0056b3;
+        }
+
+
+        .review-form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .rating-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .rating-options {
+            display: flex;
+            gap: 10px;
+        }
+        .rating-options input {
+            display: none;
+        }
+        .rating-options label {
+            padding: 5px 10px;
+            background: #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .rating-options input:checked + label {
+            background: #f39c12;
+            color: #fff;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .submit-review {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .submit-review:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -288,7 +433,16 @@
                 <h1 class="product-title">{{ product.name }}</h1>
                 <p class="price">{{ product.price }}</p>
                 <div class="rating">
-                    ⭐⭐⭐⭐⭐ <span>(4.6/5, 556 reviews)</span>
+                    <span>
+                        {% for i in "12345" %}
+                            {% if i|add:"0" <= average_rating %}
+                                ⭐
+                            {% else %}
+                                ☆
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+                    <span>({{ average_rating }}/5, {{ total_reviews }} reviews)</span>
                 </div>
                 <p class="description">{{ product.description }}</p>
                 <ul style="list-style-type: none; padding-left: 0;">
@@ -296,13 +450,19 @@
                         <li><strong>{{ attribute.attribute_type }}:</strong> {{ attribute.value }}</li><br>
                     {% endfor %}
                 </ul>
-                <p class="description">Stock: {{ product.stock }}</p>
+                <p class="description">Stock:
+                    {% if product.stock > 0 %}
+                    {{ product.stock }}
+                {% else %}
+                    <span class="out-of-stock">Out of Stock</span>
+                {% endif %}
+                   </p>
         
-                <div class="quantity-add">
+                {% comment %} <div class="quantity-add">
                     <button class="quantity-btn" data-action="decrement" data-product-id="{{ product.id }}">-</button>
                     <span class="quantity" id="quantity-{{ product.id }}">{{ cart_item.quantity|default:1 }}</span>
                     <button class="quantity-btn" data-action="increment" data-product-id="{{ product.id }}">+</button>
-                </div>
+                </div> {% endcomment %}
                 
                 <form action="{% url 'add_to_cart' product.id %}" method="post" style="display: inline;">
                     {% csrf_token %}
@@ -360,6 +520,8 @@
 
         </div>
 
+
+
         <section class="related-products">
             <h2>Related Products</h2>
             <div class="product-list">
@@ -377,11 +539,57 @@
 
         <section class="customer-reviews">
             <h2>Customer Reviews</h2>
+            
+            <!-- Display Reviews -->
             <div class="reviews">
-                <!-- Reviews section can be dynamically generated here -->
+                {% if reviews %}
+                    {% for review in reviews %}
+                        <div class="review">
+                            <div class="review-header">
+                                <strong>{{ review.user.username }}</strong>
+                                <span class="stars">{% for i in "12345"|make_list %}
+                                    {% if forloop.counter <= review.rating %}
+                                        &#9733;
+                                    {% else %}
+                                        &#9734;
+                                    {% endif %}
+                                {% endfor %}</span>
+                            </div>
+                            <p class="review-text">{{ review.review_text }}</p>
+                            <p class="review-date">Reviewed on: {{ review.created_at|date:"F d, Y" }}</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="no-reviews">No reviews yet. Be the first to review!</p>
+                {% endif %}
             </div>
+            
+            <!-- Submit Review Form -->
+            <h3>Submit a Review</h3>
+            <form method="POST" class="review-form">
+                {% csrf_token %}
+                <div class="rating-container">
+                    <label for="rating">Your Rating:</label>
+                    <div class="rating-options">
+                        <input type="radio" id="star5" name="rating" value="5">
+                        <label for="star5">5</label>
+                        <input type="radio" id="star4" name="rating" value="4">
+                        <label for="star4">4</label>
+                        <input type="radio" id="star3" name="rating" value="3">
+                        <label for="star3">3</label>
+                        <input type="radio" id="star2" name="rating" value="2">
+                        <label for="star2">2</label>
+                        <input type="radio" id="star1" name="rating" value="1">
+                        <label for="star1">1</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="review_text">Your Review:</label>
+                    <textarea id="review_text" name="review_text" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="submit-review">Submit Review</button>
+            </form>
         </section>
-    </div>
 
     <!-- Image Zoom Modal -->
     <div class="zoom-container" id="zoom-container">
@@ -519,6 +727,8 @@
                 return csrfTokenElement ? csrfTokenElement.value : '';
             }
         });
+
+    
     </script>
 
     <style>

@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='address',
             name='phone_number',
-            field=models.CharField(default='0000000000', max_length=15),
+            field=models.CharField(max_length=15),
         ),
     ]

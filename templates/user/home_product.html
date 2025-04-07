@@ -1,6 +1,8 @@
 {% extends 'header_footer.html' %}
 
 {% block content %}
+
+{% load static %}
     <title>Categories and Products</title>
     <style>
         body {
@@ -108,7 +110,7 @@
         }
         
         .product {
-            width: 200px; /* Adjust as needed */
+            width: 300px; /* Adjust as needed */
             border: 1px solid #ddd;
             border-radius: 5px;
             padding: 20px;
@@ -174,6 +176,99 @@
             padding: 5px;
             font-size: 1em;
         }
+
+
+
+
+        .product {
+            position: relative;
+            max-width: 250px;
+            margin: 20px;
+            background: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer; /* Make the product block clickable */
+        }
+        
+        .product-image {
+            width: 100%;
+            height: auto;
+        }
+        
+        .product-actions {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            pointer-events: all; /* Allow interaction with the icons */
+            z-index: 1; /* Ensure the actions are above the product image */
+        }
+        
+        .wishlist-btn, .cart-btn {
+            font-size: 24px;
+            color: white;
+            z-index: 2; /* Ensure the icons are above other content */
+            cursor: pointer; /* Ensure the icons are clickable */
+        }
+        
+        .wishlist-btn {
+            bottom: 20px;
+            left: 10px;
+        }
+        
+        .cart-btn {
+            bottom: 10px;
+            right: 10px;
+        }
+        
+        .wishlist-btn:hover, .cart-btn:hover {
+            color:rgb(211, 44, 66); /* Change color on hover to match your theme */
+        }
+        
+        .product-link {
+            text-decoration: none;
+            color: inherit;
+            display: block; /* Ensure the link wraps the entire product block */
+        }
+        
+        .product-link:hover {
+            text-decoration: none; /* Prevent link hover from affecting the product */
+        }
+        
+        .product h3, .product p {
+            text-align: center;
+            margin: 10px 0;
+        }
+        
+        .product-price {
+            font-weight: bold;
+            color: #000;
+            margin: 10px 0;
+        }
+        
+        /* Make the product actions container (icons) have higher z-index */
+        .product-actions a {
+            pointer-events: all; /* Allow clicking on the individual icons */
+        }
+        
+        .product:hover {
+            transform: scale(1.05); /* Slightly increase size on hover for effect */
+        }
+        
+        .product img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+    .fa-heart,
+    .fa-shopping-cart {
+        font-size: 24px;
+    }
+
     </style>
 
 </head>
@@ -232,28 +327,35 @@
 
     <!-- Results will be displayed here -->
     <div id="searchResults"></div>
-
     <div class="product-grid">
         {% for product in products %}
             <div class="product">
-                <a href="{% url 'product_details' product.id %}" style="text-decoration: none; color: inherit;">
-                {% if product.image1 %}
-                <img src="{{ product.image1.url }}" alt="{{ product.name }}">
-                <h3>{{ product.name }}</h3>
-                <p>{{ product.description }}</p>
-                <div class="price">₹{{ product.price }}</div>
-                {% else %}
-                <p> NO image is available. </p>
-                <h3>{{ product.name }}</h3>
-                <p>{{ product.description }}</p>
-                <div class="price">₹{{ product.price }}</div>
-                {% endif %}
+                <a href="{% url 'product_details' product.id %}" class="product-link">
+                    {% if product.image1 %}
+                        <img src="{{ product.image1.url }}" alt="{{ product.name }}" class="product-image">
+                    {% else %}
+                        <div class="no-image-placeholder">No image available</div>
+                    {% endif %}
+                    <h3 class="product-name">{{ product.name }}</h3>
+                    <p class="product-description">{{ product.description }}</p>
+                    <div class="product-price">₹{{ product.price }}</div>
+                </a>
                 
+                <!-- Wishlist and Cart Icons -->
+                <div class="product-actions">
+                    <a href="{% url 'add_to_wishlist' product.id %}" class="wishlist-btn" title="Add to Wishlist">
+                        <i class="fa fa-heart"></i>
+                    </a>
+                    <a href="{% url 'add_to_cart' product.id %}" class="cart-btn" title="Add to Cart">
+                        <i class="fas fa-shopping-cart"></i>
+                    </a>
+                </div>
             </div>
         {% empty %}
             <p>No products available.</p>
         {% endfor %}
     </div>
+    
 
     <script>
         function filterProducts() {

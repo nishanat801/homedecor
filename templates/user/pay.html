@@ -6,13 +6,24 @@
     
 {% load static %}
 
-    <style>
+   <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
         .container {
             max-width: 800px;
-            margin: 0 auto;
+            margin: 40px auto;
             padding: 20px;
-            font-family: Aria;l, sans-serif;
-            background-color: #d3b787
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
         }
         .order-item {
             display: flex;
@@ -25,24 +36,34 @@
             height: 100px;
             object-fit: cover;
             margin-right: 20px;
+            border-radius: 5px;
         }
         .item-details {
             flex-grow: 1;
         }
+        .item-name {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
         .item-price {
             font-weight: bold;
-            color: #333;
+            color: #2d88ff;
         }
         .summary {
             margin-top: 20px;
             padding: 20px;
-            background-color: #f8f8f8;
+            background: #f8f8f8;
             border-radius: 5px;
         }
+        .summary p {
+            font-size: 1em;
+            margin: 10px 0;
+        }
         .total {
-            font-size: 1.2em;
+            font-size: 1.3em;
             font-weight: bold;
             text-align: right;
+            color: #222;
         }
         .razorpay-btn {
             display: block;
@@ -61,6 +82,24 @@
         .razorpay-btn:hover {
             background-color: #1a73e8;
         }
+        .coupon-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .coupon-section input {
+            padding: 10px;
+            width: 70%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .coupon-section button {
+            padding: 10px 15px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -72,85 +111,36 @@
         <div class="order-item">
             <img src="{{ item.product.image1.url }}" alt="{{ item.product.name }}" class="item-image">
             <div class="item-details">
-                <h3>{{ item.product.name }}</h3>
+                <p class="item-name">{{ item.product.name }}</p>
                 <p>Quantity: {{ item.quantity }}</p>
                 <p class="item-price">₹{{ item.product.price }}</p>
             </div>
         </div>
         {% endfor %}
 
-      {% comment %} <!-- Order Summary -->
-<div class="summary">
-    <p>Subtotal: ₹<span id="subtotal">{{ subtotal }}</span></p>
-    <p>Shipping: ₹<span id="shipping">{{ shipping }}</span></p>
+        <!-- Order Summary -->
+        <div class="summary">
+            <p>Subtotal: ₹<span id="subtotal">{{ subtotal }}</span></p>
 
-    <!-- Show discount only if applied -->
-    {% if discount_amount %}
-    <p class="discount">
-        Discount: -₹<span id="discount-amount">{{ discount_amount }}</span>
-    </p>
-    {% endif %}
+            <!-- Show discount only if applied -->
+            {% if discount %}
+            <p class="discount" style="color: green;">
+                Discount: -₹<span id="discount-amount">{{ discount }}</span>
+            </p>
+            {% endif %}
 
-    <p class="total">Total Amount: ₹<span id="final-total">{{ total_amount }}</span></p>
+            <p class="total">Total Amount: ₹<span id="final-total">{{ total_amount }}</span></p>
+        </div>
+
+       {% comment %} <!-- Coupon Section -->
+<div class="coupon-section">
+    <input type="text" id="coupon-code" placeholder="Enter Coupon Code">
+    <button type="button" id="apply-coupon-btn">Apply Coupon</button>
+    <p id="coupon-message" style="display:none; color: green;"></p>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 </div> {% endcomment %}
+
         <!-- Razorpay Payment Button -->
-
-        <!-- Coupon Section -->
-        {% comment %} {% if coupon %}
-        <div class="alert alert-success">
-             You can redeem this coupon: <strong>{{ coupon.code }}</strong> for a {{ coupon.discount_percentage }}% discount!
-        </div>
-    {% else %}
-        <div class="alert alert-warning">
-             No available coupons at the moment.
-        </div>
-    {% endif %} {% endcomment %}
-
-
-        <!-- Coupon Discount Display -->
-       
-{% comment %} 
-        <div class="coupon-section">
-            <input type="text" id="coupon-code" placeholder="Enter Coupon Code">
-            <button type="button" id="apply-coupon-btn">Redeem the coupon</button>
-            <p id="coupon-message" style="display:none; color: green;"></p>
-        </div> {% endcomment %}
-        
-       <!-- Order Summary Section -->
-<div class="checkout-card">
-    <div class="section-heading">Order Summary</div>
-
-    {% for item in cart_items %}
-    <div class="order-item">
-        <div class="order-details">
-            <h4>{{ item.product.name }}</h4>
-            <p class="order-quantity">Quantity: {{ item.quantity }}</p>
-        </div>
-        <div class="order-price">{{ item.product.price }}</div>
-    </div>
-    {% endfor %}
-
-    <div class="order-summary">
-        <div class="summary-row">
-            <span>Subtotal</span>
-            <span id="subtotal">{{ subtotal }}</span>
-        </div>
-
-        {% comment %} <!-- Coupon Discount: Initially Hidden -->
-        <div class="summary-row" id="coupon-discount-row" style="display: none;">
-            <span>Coupon Discount (<span id="applied-coupon-code"></span>)</span>
-            <span id="coupon-discount"></span>
-        </div> {% endcomment %}
-
-        <div class="summary-row total-row">
-            <strong>Total</strong>
-            <strong id="final-total">{{ total_amount }}</strong>
-        </div>
-    </div>
-</div>
-
-
-        
         <button id="rzp-button" class="razorpay-btn">Pay with Razorpay</button>
     </div>
 
@@ -159,7 +149,7 @@
 <script>
     document.getElementById('rzp-button').onclick = function (e) {
         e.preventDefault();
-
+        
         var options = {
             "key": "{{ razorpay_key }}",
             "amount": parseInt("{{ total_amount|floatformat:0 }}") * 100,  // ✅ Corrected amount formatting
@@ -197,6 +187,49 @@
                     alert("An error occurred. Please try again.");
                 });
             },
+
+
+         "modal": {
+    "ondismiss": function () {
+        console.log("Payment window closed - marking as failed");
+        
+        // Log the order ID to ensure it's available
+        var orderId = "{{ razorpay_order_id }}";
+        console.log("Order ID: " + orderId);
+
+        fetch('/payment-failed/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                razorpay_order_id: orderId,
+                error_code: "modal_closed",
+                error_description: "User closed payment modal"
+            })
+        })
+        .then(response => {
+            console.log("Payment failure fetch response status: ", response.status);  // Log response status
+            return response.json();
+        })
+        .then(data => {
+            console.log("Failure response:", data);  // Log server response
+            if (data.status === "success") {
+                window.location.href = "/payment-failed-page/?order_id=" + orderId;
+            } else {
+                alert("Failed to record payment failure: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);  // Log any errors in the fetch process
+            alert("An error occurred while recording payment failure");
+        });
+    }
+},
+
+
+
             "prefill": {
                 "name": "{{ request.user.username }}",
                 "email": "{{ request.user.email }}"
@@ -212,37 +245,6 @@
 
 
         
-        document.getElementById("apply-coupon-btn").addEventListener("click", function () {
-            let couponCode = document.getElementById("coupon-code").value;
-            let csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
-    
-            if (!couponCode) {
-                alert("Please enter a coupon code.");
-                return;
-            }
-    
-            fetch("/apply-coupon/", {
-                method: "POST",
-                body: JSON.stringify({ coupon_code: couponCode }),
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": csrfToken
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Show the coupon discount
-                    document.getElementById("coupon-discount-row").style.display = "flex";
-                    document.getElementById("applied-coupon-code").textContent = couponCode;
-                    document.getElementById("coupon-discount").textContent = `-${data.discount_amount}`;
-                    document.getElementById("final-total").textContent = data.final_total;
-                } else {
-                    alert(data.error);
-                }
-            })
-            .catch(error => console.error("Error:", error));
-        });
     </script>
 </body>
 </html>

@@ -16,4 +16,6 @@ urlpatterns = [
 
     path("orders/admin", views.admin_orders, name="admin_orders"),
     path("orders/admin/<int:order_id>/", views.admin_order_details, name="admin_order_details"),
+
+    path('order/<int:order_id>/download-invoice/', views.download_invoice, name='download_invoice'),
 ]

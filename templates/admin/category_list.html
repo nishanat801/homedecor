@@ -3,8 +3,15 @@
 {% block title %}Category List{% endblock %}
 
 {% block content %}
+
 <div class="container">
     <h1 style="text-align: center; margin-bottom: 20px;">Category List</h1>
+
+     <!-- Search Form -->
+     <form method="get" action="{% url 'category_list' %}" style="text-align: center; margin-bottom: 20px;">
+        <input type="text" name="search" value="{{ search_query }}" placeholder="Search by category name" />
+        <button type="submit">Search</button>
+    </form>
 
     <!-- Add Category Button -->
     <button class="add-category-btn" onclick="window.location.href='{% url 'add_category' %}'">Add Category</button>
@@ -33,11 +40,13 @@
                     <td>{{ category.name }}</td>
                     <td>{{ category.description }}</td>
                     <td>
-                        <a href="{% url 'edit_category' category.id %}" class="btn btn-edit">Edit</a>
-                        <form action="{% url 'delete_category' category.id %}" method="POST" style="display: inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-delete">Delete</button>
-                        </form>
+                        <a href="{% url 'edit_category' category.id %}" class="btn btn-edit" style="text-decoration: none;">Edit</a>
+
+                        {% if category.is_active %}
+                            <a href="{% url 'unlist_category' category.id %}" class="btn btn-unlist" style="text-decoration: none;">Unlist</a>
+                        {% else %}
+                            <a href="{% url 'list_category' category.id %}" class="btn btn-list" style="text-decoration: none;">List</a>
+                        {% endif %}
                     </td>
                 </tr>
             {% empty %}
@@ -47,6 +56,24 @@
             {% endfor %}
         </tbody>
     </table>
+<!-- Pagination -->
+<div class="pagination" style="text-align: center;">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1&search={{ search_query }}">First</a>
+            <a href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}">Previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&search={{ search_query }}">Next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}&search={{ search_query }}">Last</a>
+        {% endif %}
+    </span>
+</div>
 </div>
 
 <!-- Internal CSS -->
@@ -75,21 +102,14 @@
     }
 
     .btn {
+        color: white;
         padding: 5px 10px;
         border: none;
         cursor: pointer;
         border-radius: 5px;
     }
 
-    .btn-edit {
-        background-color: #007bff;
-        color: white;
-    }
 
-    .btn-delete {
-        background-color: #dc3545;
-        color: white;
-    }
 
     .add-category-btn {
         display: block;
@@ -100,6 +120,35 @@
         border-radius: 5px;
         cursor: pointer;
         text-align: center;
+    }
+    a.btn-edit {
+        background-color: #4CAF50;
+    }
+
+    a.btn-list {
+        background-color: #f44336;
+    }
+    
+    a.btn-unlist{
+        background-color: #da190b; 
+    }
+    .pagination {
+        display: inline-block;
+        margin-top: 20px;
+    }
+    
+    .pagination a {
+        padding: 8px 16px;
+        margin: 0 4px;
+        border: 1px solid #ddd;
+        text-decoration: none;
+    }
+    
+    .pagination .current {
+        padding: 8px 16px;
+        margin: 0 4px;
+        background-color: #f1f1f1;
+        border: 1px solid #ddd;
     }
 </style>
 {% endblock %}

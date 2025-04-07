@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from django.contrib.messages import constants as messages
+from decouple import config
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -22,10 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-a+!yue%#&_iz8*4^j&2n1q*b9*x^=mp*mp75f=&a2ml-(@i$kz'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = []
 
@@ -57,7 +58,8 @@ INSTALLED_APPS = [
     'orders',
     'payments',
     'coupons',
-    'wallet'
+    'wallet',
+    'dashboard',
     # 'coupons.apps.CouponsConfig', 
 ]
 
@@ -109,11 +111,11 @@ WSGI_APPLICATION = 'Home_Decor.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'homedecordb',          # Replace with your database name
-        'USER': 'home_decor',        # Replace with your database user
-        'PASSWORD': 'homedecor123',# Replace with your database password
-        'HOST': '127.0.0.1',     # Replace with your database host
-        'PORT': '5432',          # Default PostgreSQL port
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),         # Default PostgreSQL port
     }
 }
 
@@ -207,12 +209,16 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
         'AUTH_PARAMS': {
             'access_type': 'online',
+            'prompt': 'select_account',
         },
         'OAUTH_PKCE_ENABLED': True,
     }
 }
 LOGIN_REDIRECT_URL = 'http://127.0.0.1:8000/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
+
 
 LOGGING = {
     'version': 1,
@@ -239,3 +245,5 @@ import razorpay
 
 SESSION_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SECURE = True
+
+

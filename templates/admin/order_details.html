@@ -67,18 +67,11 @@
         <p>User: <strong>{{ order.user.username }}</strong></p>
         <p>Shipping Address: <strong>{{ shipping_address }}</strong></p>
         <p>Total Price: <strong>₹{{ total_price }}</strong></p>
-        
-        {% comment %}
-        <p>Payment Type: <strong>{{ order.get_payment_type_display }}</strong></p>
-        {% endcomment %}
-        
-        {% if order.payment_status == 'Failure' %}
-            <p>Payment Status: <span style="color: red;">{{ order.status }}</span></p>
-        {% comment %} {% else %}
-            <p>Payment Status: {{ order.status}}</p> {% endcomment %}
-        {% endif %}
-       
-        
+        {% comment %} <p>Discount Amount: <strong>₹{{ total_discount }}</strong></p> {% endcomment %}
+        <p>Final Price: <strong>₹{{ final_total }}</strong></p>
+        <p>Payment Type: <strong>{{ order.payment_method }}</strong></p>
+        <p>Payment Status: <strong>{{ order.payment_status }}</strong></p>
+
         <h5>Order Items:</h5>
         <table class="table">
             <thead>
@@ -91,44 +84,43 @@
                 </tr>
             </thead>
             <tbody>
-              {% if order_items %}
-              {% for item in order_items %}
-                  <tr>
-                      <td>{{ item.product.name }}</td>
-                      <td>{{ item.quantity }}</td>
-                      <td>₹{{ item.price }}</td>
-                      {% if item.status == "Cancelled" %}
-                      <span class="cancelled-label"><td>{{ item.status }}</td>Cancelled</span>
-                      {% else %}
-                      <td>{{ item.status }}</td>
-                      <td>
-                        <form method="POST">
-                          {% csrf_token %}
-                          <input type="hidden" name="item_id" value="{{ item.id }}">
-                          <select name="new_status">
-                              <option value="Pending" {% if item.status == "Pending" %}selected{% endif %}>Pending</option>
-                              <option value="Shipped" {% if item.status == "Shipped" %}selected{% endif %}>Shipped</option>
-                              <option value="Delivered" {% if item.status == "Delivered" %}selected{% endif %}>Delivered</option>
-                              <option value="Returned" {% if item.status == "Returned" %}selected{% endif %}>Returned</option>
-                          </select>
-                          <button type="submit">Update</button>
-                      </form>
+                {% for item in order_items %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>₹{{ item.price }}</td>
+                        <td class="{% if item.status in 'Cancelled Returned Refunded' %}cancelled-label{% endif %}">
+                            {{ item.status }}
+                        </td>
+                        <td>
+                          {% if item.status not in "Cancelled, Returned, Refunded, Returned & Refunded" %}
+                              <form method="POST">
+                                  {% csrf_token %}
+                                  <input type="hidden" name="item_id" value="{{ item.id }}">
+                                  <select name="new_status">
+                                      <option value="Pending" {% if item.status == "Pending" %}selected{% endif %}>Pending</option>
+                                      <option value="Shipped" {% if item.status == "Shipped" %}selected{% endif %}>Shipped</option>
+                                      <option value="Delivered" {% if item.status == "Delivered" %}selected{% endif %}>Delivered</option>
+                                      {% if item.status == "Requested for Refund" %}
+                                          <option value="Refunded">Approve Refund</option>
+                                      {% endif %}
+                                      {% if item.status == "Requested for Return" %}
+                                          <option value="Returned & Refunded">Approve Return & Refund</option>
+                                      {% endif %}
+                                  </select>
+                                  <button type="submit">Update</button>
+                              </form>
+                          {% else %}
+                              —  
+                          {% endif %}
                       </td>
-                  </tr>
-                  {% endif %}
-              {% endfor %}
-          {% else %}
-              <tr>
-                  <td colspan="5" style="text-align: center; color: red;">No items found.</td>
-              </tr>
-          {% endif %}
-          </tbody>
-          
-          
-          
+                    </tr>
+                {% endfor %}
+            </tbody>
         </table>
       </div>
     </div>
   </div>
 </div>
+
 {%endblock%}

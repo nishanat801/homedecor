@@ -294,7 +294,7 @@ def reset_password(request):
 @never_cache
 def admin_login(request):
     if request.user.is_authenticated:
-        return redirect('products:product_list')
+        return redirect('sales_dashboard')
     
     
     if request.method == 'POST':
@@ -311,17 +311,21 @@ def admin_login(request):
             if admin is not None and admin.is_superuser:
                 login(request, admin)
                 
-                return redirect('products:product_list')
+                return redirect('sales_dashboard')
         
         error_message = "Invalid credentials or not a superuser."
         
         return render(request, 'admin/admin_login.html', {'error_message': error_message})
 
-    return render(request, 'admin/admin_login.html')
+    response = render(request, 'admin/admin_login.html')
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0'
+    return response
+
+
 from products.models import Product
 @never_cache
 def admin_logout(request):
     request.session.flush()
     logout(request)
-    return redirect('Authentication:admin/admin_login')
+    return redirect('Authentication:admin_login')  # Correct redirect format
 

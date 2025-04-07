@@ -3,16 +3,179 @@
 {% block title %}Order Successful - Home Decor{% endblock %}
 
 {% block content %}
-<div class="main-panel">
-    <div class="content-wrapper">
-        <div class="card dark-theme">
-            <div class="card-body text-center">
-                <i class="fas fa-check-circle text-success" style="font-size: 48px;"></i>
-                <h2 class="mt-3 text-white">Order #{{ order.id }} Placed Successfully!</h2>
-                <p class="text-muted">Thank you for your purchase.</p>
-                <a href="{% url 'products_user' %}" class="btn btn-primary mt-3">Continue Shopping</a>
-            </div>
+<style>
+    /* General container styles */
+.order-success-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding-top: 50px;
+}
+
+h2.text-success {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.lead {
+    font-size: 1.2rem;
+    color: #555;
+}
+
+.order-summary {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+}
+
+.order-info {
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.order-info strong {
+    color: #007bff;
+}
+
+.order-items {
+    margin-top: 30px;
+}
+
+.order-item-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.order-item {
+    border-bottom: 1px solid #f1f1f1;
+    padding: 15px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+.product-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.product-details {
+    font-size: 1rem;
+    color: #555;
+    margin-top: 5px;
+}
+
+.product-details span {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.product-details strong {
+    font-size: 1.1rem;
+    color: #333;
+    margin-top: 10px;
+}
+
+.order-completion {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.success-icon {
+    font-size: 60px;
+    color: #28a745;
+    margin-bottom: 20px;
+}
+
+.order-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+    margin-right: 20px;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.8;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+</style>
+<!-- Main container for the order success page -->
+<div class="container order-success-container">
+    <div class="text-center">
+        <h2 class="text-success">Order Successfully Placed!</h2>
+        <p class="lead">Your order has been confirmed. Thank you for shopping with us!</p>
+    </div>
+
+    <div class="order-summary">
+        <div class="order-info">
+            <p><strong>Order ID:</strong> {{ order.id }}</p>
+            <p><strong>Tracking Number:</strong> {{ order.tracking_number }}</p>
+        </div>
+
+        <div class="order-items">
+            <h4>Items in Your Order:</h4>
+            <ul class="order-item-list">
+                {% for item in order_items %}
+                    <li class="order-item">
+                        <div class="product-name">{{ item.product.name }}</div>
+                        <div class="product-details">
+                            <span>Quantity: {{ item.quantity }}</span>
+                            <span>Price: {{ item.price }}</span>
+                            <span>Discount: {{ item.discount_amount }}</span>
+                            <strong>Final Amount: {{ item.final_amount }}</strong>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Order completion icon and message -->
+        <div class="order-completion">
+            <i class="fas fa-check-circle text-success success-icon"></i>
+            <h2>Order #{{ order.id }} Placed Successfully!</h2>
+            <p class="text-muted">Thank you for your purchase. We will notify you once your order is shipped.</p>
+        </div>
+
+        <!-- Buttons for further actions -->
+        <div class="order-actions">
+            <a href="{% url 'products_user' %}" class="btn btn-primary">Continue Shopping</a>
+            <a href="{% url 'orders:download_invoice' order.id %}" class="btn btn-secondary">Download Invoice</a>
         </div>
     </div>
 </div>
 {% endblock %}
+
+

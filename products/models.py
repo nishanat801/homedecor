@@ -1,5 +1,6 @@
 from django.db import models
 from category.models import Category
+from Authentication.models import CustomUser
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
@@ -24,3 +25,5 @@ class ProductAttribute(models.Model):
 
     def __str__(self):
         return f"{self.product.name} - {self.attribute_type}: {self.value}"
+    
+

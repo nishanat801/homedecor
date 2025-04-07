@@ -49,7 +49,7 @@ def apply_coupon(request):
             print("📢 Final Total After Discount:", final_total)
 
             # ✅ Save the coupon usage for this user
-            CouponUsage.objects.create(user=request.user, coupon=coupon,final_total=final_total)
+            # CouponUsage.objects.create(user=request.user, coupon=coupon,final_total=final_total,discount_amount=discount_amount).save()
 
             # ✅ Store applied coupon in session
             request.session["applied_coupon_code"] = coupon.code

@@ -1,293 +1,379 @@
 {% extends 'header_footer.html' %}
 
 {% block content %}
-
-{% load static%}
+{% load static %}
 
 <style>
-    
-    header nav {
-        padding: 10px;
-        background-color: #333;
-        color: white;
-    }
-    
-    header nav a {
-        color: #fff;
-        text-decoration: none;
-        margin-right: 5px;
-    }
-    
-    h1 {
-        margin: 20px;
-        text-align: center;
-    }
-    
-    .cart {
-        display: flex;
-        justify-content: space-between;
+    /* Main Cart Container */
+    .cart-container {
+        max-width: 1200px;
+        margin: 0 auto;
         padding: 20px;
     }
-    
-    
 
-
-    .cart-items {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        padding: 80px;
-    
+    .cart-title {
+        text-align: center;
+        margin: 30px 0;
+        font-size: 2rem;
+        color: #333;
     }
 
+    /* Cart Layout */
+    .cart-layout {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 30px;
+    }
+
+    /* Cart Items Section */
+    .cart-items-section {
+        flex: 1;
+        min-width: 300px;
+    }
+
+    /* Individual Cart Item */
     .cart-item {
         display: flex;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+
+    .cart-item:hover {
+        transform: translateY(-3px);
+    }
+
+    .item-image {
+        width: 150px;
+        padding: 20px;
+        display: flex;
         align-items: center;
-        gap: 15px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        padding: 70px;
-        background-color: #f9f9f9;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        justify-content: center;
+        background: #f9f9f9;
     }
 
     .item-image img {
-        width: 100px;
-        height: auto;
-        border-radius: 5px;
+        max-width: 100%;
+        max-height: 120px;
+        object-fit: contain;
     }
 
-    .item-content {
+    .item-details {
+        flex: 1;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .item-name {
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+        color: #333;
+    }
+
+    .item-description {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+
+    .item-stock {
+        color: #666;
+        font-size: 0.85rem;
+        margin-bottom: 15px;
+    }
+
+    .item-price {
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    /* Quantity Controls */
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .quantity-btn {
+        width: 30px;
+        height: 30px;
+        background: #f0f0f0;
+        border: 1px solid #ddd;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .quantity-btn:hover {
+        background: #e0e0e0;
+    }
+
+    .quantity-display {
+        width: 40px;
+        text-align: center;
+        margin: 0 5px;
+    }
+
+    /* Item Actions */
+    .item-actions {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        width: 100%;
+        margin-top: auto;
     }
 
-    .item-info, .item-quantity, .item-total, .item-remove {
-        margin: 0 10px;
-        text-align: center;
+    .item-total {
+        font-weight: bold;
+        color: #b8945e;
     }
 
-    .item-info h3 {
-        font-size: 1.2em;
-        margin-bottom: 5px;
-    }
-
-    .item-info p {
-        font-size: 0.9em;
-        color: #555;
-    }
-
-    .item-remove button {
-        background-color: #ff4d4d;
+    .remove-btn {
+        background: #ff4d4d;
         color: white;
         border: none;
-        padding: 8px 12px;
-        border-radius: 3px;
+        padding: 8px 15px;
+        border-radius: 4px;
         cursor: pointer;
+        font-size: 0.9rem;
+        transition: background 0.3s;
     }
 
-    .item-remove button:hover {
-        background-color: #e60000;
+    .remove-btn:hover {
+        background: #e60000;
     }
 
-
-    
-    
-    .discount {
-        color: red;
-        font-weight: bold;
-    }
-    
+    /* Order Summary */
     .order-summary {
-        width: 30%;
-        padding: 20px;
+        width: 100%;
+        max-width: 350px;
         background: #fff;
-        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        padding: 25px;
+        height: fit-content;
     }
-    
-    .order-summary h2 {
+
+    .summary-title {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
         text-align: center;
+        color: #333;
     }
-    
-    .order-summary p {
-        margin: 10px 0;
+
+    .summary-details {
+        margin-bottom: 20px;
     }
-    
-    .saving {
-        color: red;
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 0.95rem;
     }
-    
+
+    .summary-total {
+        font-weight: bold;
+        font-size: 1.1rem;
+        margin: 20px 0;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+    }
+
     .checkout-btn {
         width: 100%;
-        padding: 10px;
-        background: green;
+        padding: 12px;
+        background: #b8945e;
         color: white;
         border: none;
-        font-size: 16px;
+        border-radius: 4px;
+        font-size: 1rem;
         cursor: pointer;
+        transition: background 0.3s;
     }
-    
+
+    .checkout-btn:hover {
+        background: #a5824d;
+    }
+
     .promo-btn {
-        margin: 20px auto;
         display: block;
-        padding: 10px;
-        font-size: 14px;
+        margin: 30px auto;
+        padding: 10px 20px;
+        background: transparent;
+        border: 1px solid #b8945e;
+        color: #b8945e;
+        border-radius: 4px;
         cursor: pointer;
+        transition: all 0.3s;
     }
-    
-    button {
-        padding: 5px;
-       
-        cursor: pointer;
+
+    .promo-btn:hover {
+        background: #b8945e;
+        color: white;
     }
-    
-   
-    
+
+    /* Messages/Alerts */
+    .alert {
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 4px;
+        text-align: center;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .alert-error {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .cart-layout {
+            flex-direction: column;
+        }
+        
+        .order-summary {
+            max-width: 100%;
+        }
+        
+        .cart-item {
+            flex-direction: column;
+        }
+        
+        .item-image {
+            width: 100%;
+        }
+    }
 </style>
 
-<main>
-    <h1>Shopping Cart</h1>
-    <p>Buy 183 more to get Free Shipping</p>
-    <div class="cart-items">
-        {% for item in cart_items %}
-        <div class="cart-item">
-            <div class="item-image">
-                {% if item.product.image1 %}
-                    <img src="{{ item.product.image1.url }}" alt="{{ item.product.name }}">
-                {% else %}
-                    <img src="{% static 'images/placeholder.png' %}" alt="No image available">
-                {% endif %}
-            </div>
-    
-            <div class="item-content">
-                <div class="item-info">
-                    <h3>{{ item.product.name }}</h3>
-                    <p>{{ item.product.description }}</p>
-                    <p>Price: {{ item.product.price }}</p>
-                </div>
-
-                <div class="quantity-add">
-                    <!-- Decrement Button -->
-                    <button class="quantity-btn update-cart" data-action="decrement" data-product-id="{{ item.product.id }}">-</button>
-                
-                    <!-- Display Quantity -->
-                    <span class="quantity" id="quantity-{{ item.product.id }}">{{ item.quantity }}</span>
-                
-                    <!-- Increment Button -->
-                    <button class="quantity-btn update-cart" data-action="increment" data-product-id="{{ item.product.id }}">+</button>
-                </div>
-            
-                <!-- Total Price -->
-                <div class="item-total">
-                    <p>Total: <span id="total-price-{{ item.product.id }}">{{ item.total_amount }}</span> SAR</p>
-                </div>
-            
-    
-                <div class="item-remove">
-                    <form action="{% url 'remove_from_cart' item.product.id %}" method="POST">
-                        {% csrf_token %}
-                        <button type="submit" class="remove-item">Remove</button>
-                    </form>
-                </div>
-
-            </div>
+<main class="cart-container">
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}error{% else %}success{% endif %}">
+            {{ message }}
         </div>
-        {% endfor %}
-    </div>
-    
+    {% endfor %}
+    {% endif %}
 
+    <h1 class="cart-title">Your Shopping Cart</h1>
+    
+    <div class="cart-layout">
+        <section class="cart-items-section">
+            {% if cart_items %}
+                {% for item in cart_items %}
+                <article class="cart-item">
+                    <div class="item-image">
+                        {% if item.product.image1 %}
+                            <img src="{{ item.product.image1.url }}" alt="{{ item.product.name }}">
+                        {% else %}
+                            <img src="{% static 'images/placeholder.png' %}" alt="No image available">
+                        {% endif %}
+                    </div>
+                    
+                    <div class="item-details">
+                        <h3 class="item-name">{{ item.product.name }}</h3>
+                        <p class="item-description">{{ item.product.description|truncatechars:100 }}</p>
+                        <p class="item-stock">Stock: {{ item.product.stock }}</p>
+                        <p class="item-price">Price: ₹{{ item.product.price }} </p>
+                        
+                        <div class="quantity-controls">
+                            <button class="quantity-btn update-cart" data-action="decrement" data-product-id="{{ item.product.id }}">-</button>
+                            <span class="quantity-display" id="quantity-{{ item.product.id }}">{{ item.quantity }}</span>
+                            <button class="quantity-btn update-cart" data-action="increment" data-product-id="{{ item.product.id }}">+</button>
+                        </div>
+                        
+                        <div id="cart-message" style="display: none; color: red; font-weight: bold;"></div>
+                        
+                        <div class="item-actions">
+                            <span class="item-total">Total: <span id="total-price-{{ item.product.id }}">{{ item.total_amount }}</span> SAR</span>
+                            <form action="{% url 'remove_from_cart' item.product.id %}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="remove-btn">Remove</button>
+                            </form>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            {% else %}
+                <p>Your cart is empty</p>
+            {% endif %}
+            
+        </section>
+        
         <aside class="order-summary">
-            <h2>Order Summary</h2>
-            <p>Subtotal ({{ cart_items.count }} items): ₹{{ subtotal }}</p>
-            {% comment %} <p>Saving: ₹{{ savings }}</p>
-            <p>Tax collected: ₹{{ tax }}</p> {% endcomment %}
-            <p>Shipping: Calculated at checkout</p>
-            <hr>
-            <p><strong>Estimated total: ₹{{ subtotal }}</strong></p>
-            <form action="{% url 'address:address_list'  %}" method="post" style="display: inline;">
+            <h2 class="summary-title">Order Summary</h2>
+            <div class="summary-details">
+                <div class="summary-row">
+                    <span>Subtotal ({{ cart_items.count }} items)</span>
+                    <span>₹{{ subtotal }} </span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span>Calculated at checkout</span>
+                </div>
+            </div>
+            
+            <div class="summary-total">
+                <div class="summary-row">
+                    <span>Estimated Total</span>
+                    <span>₹{{ subtotal }} </span>
+                </div>
+            </div>
+            
+            <form action="{% url 'address:address_list' %}" method="post">
                 {% csrf_token %}
                 <button type="submit" class="checkout-btn">Proceed to Checkout</button>
             </form>
         </aside>
     </div>
-
-    <button class="promo-btn">% Apply promo code</button>
 </main>
 
-
-
 <script>
-    {% comment %} document.querySelectorAll('.increase-quantity').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const productId = e.target.getAttribute('data-id');
-            updateQuantity(productId, 1);
-        });
-    });
-
-    document.querySelectorAll('.decrease-quantity').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const productId = e.target.getAttribute('data-id');
-            updateQuantity(productId, -1);
-        });
-    }); {% endcomment %}
-
-    document.querySelectorAll('.remove-item').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const productId = e.target.getAttribute('data-id');
-            removeItem(productId);
-        });
-    });
-
-  
-    function removeItem(productId) {
-        const row = document.querySelector(`#cart-item-${productId}`);
-        row.remove();
-
-        // Update order summary after item removal
-        updateCartSummary();
-    }
-
-    
     document.addEventListener("DOMContentLoaded", function () {
         document.body.addEventListener("click", function (event) {
-            // Check if the clicked element is one of the update-cart buttons
             if (event.target.classList.contains("update-cart")) {
-                console.log("Button Clicked!");  // Debugging
-    
+                console.log("Button Clicked!");
+                
                 let productId = event.target.getAttribute("data-product-id");
                 let action = event.target.getAttribute("data-action");
-    
-                console.log("Product ID:", productId, "Action:", action);  // Debugging
-    
+                
+                console.log("Product ID:", productId, "Action:", action);
+                
                 fetch(`/cart/update/${productId}/${action}/`, {
                     method: "GET",
                     headers: { "X-Requested-With": "XMLHttpRequest" }
                 })
                 .then(response => {
-                    // Check if response is successful
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
                     return response.json();
                 })
                 .then(data => {
-                    console.log("Response received:", data);  // Debugging
-    
+                    console.log("Response received:", data);
+                    
                     if (data.quantity === 0) {
-                        location.reload();  // Reload page if item removed
+                        location.reload();
                     } else {
-                        // Update quantity display
                         let quantityElement = document.getElementById(`quantity-${productId}`);
                         if (quantityElement) {
                             quantityElement.innerText = data.quantity;
                         }
-    
-                        // Update total price per item
+                        
                         let priceElement = document.getElementById(`total-price-${productId}`);
                         if (priceElement) {
-                            priceElement.innerText = data.total_price.toFixed(2) + " SAR";  // Update price
+                            priceElement.innerText = data.total_price.toFixed(2);
                         }
                     }
                 })
@@ -296,6 +382,20 @@
         });
     });
     
-    
+    function updateCartItem(productId, action) {
+        fetch(`/cart/update/${productId}/${action}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById("cart-message").innerText = data.error;
+                document.getElementById("cart-message").style.display = "block";
+            } else {
+                document.getElementById(`quantity-${productId}`).innerText = data.quantity;
+                document.getElementById(`total-price-${productId}`).innerText = data.total_price;
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    }
 </script>
+
 {% endblock %}

@@ -13,18 +13,36 @@
     <div class="order-details">
         <p><strong>Order ID:</strong> {{ order_id }}</p>
         {% comment %} <p><strong>Payment ID:</strong> {{ payment_id }}</p> {% endcomment %}
-        <p><strong>Amount Paid:</strong> ₹{{ total_amount }}</p>
+        <p><strong>Total Amount Paid:</strong> ₹{{ total_amount }}</p>
     </div>
 
+    <h3>Order Items</h3>
+    <ul class="order-items-list">
+        {% for item in order_items %}
+        <li>
+            <strong>{{ item.product.name }}</strong><br>
+            Quantity: {{ item.quantity }}<br>
+            Price: ₹{{ item.price }}<br>
+            {% comment %} Discount: ₹{{ item.discount_amount }}<br>
+            Final Amount: ₹{{ item.final_amount }}<br> {% endcomment %}
+        </li>
+        {% endfor %}
+    </ul>
+
+    <h4>Total Discount: ₹{{ discount_amount }}</h4>  <!-- Display the discount amount -->
+    <h4>Total Amount: ₹{{ total_amount }}</h4>  <!-- Display the total amount after discount -->
+
     <div class="action-buttons">
-        {% comment %} <a href="{% url 'orders:order_history' %}" class="btn btn-primary">View Order</a> {% endcomment %}
-        <a href="{% url 'home' %}" class="btn btn-secondary">Continue Shopping</a>
+        <a href="{% url 'products_user' %}" class="btn btn-secondary">Continue Shopping</a>
     </div>
+
+    <!-- Download Invoice Button -->
+    <a href="{% url 'orders:download_invoice' order.id %}" class="btn btn-primary">Download Invoice</a>
 </div>
 
 <style>
     .payment-success-container {
-        max-width: 600px;
+        max-width: 800px;
         margin: 50px auto;
         text-align: center;
         padding: 20px;
@@ -59,8 +77,17 @@
         margin-bottom: 20px;
     }
 
-    .order-details p {
-        margin: 8px 0;
+    .order-items-list {
+        text-align: left;
+        padding: 15px;
+        background: #f8f8f8;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        list-style-type: none;
+    }
+
+    .order-items-list li {
+        margin: 10px 0;
         font-size: 16px;
         color: #444;
     }

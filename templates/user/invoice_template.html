@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - Order #{{ order.order_number }}</title>
+    <style>
+        /* Add your styling here for the invoice */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .invoice-details {
+            margin-bottom: 20px;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .items-table th, .items-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-header">
+        <h1>Invoice</h1>
+        <p>Order #: {{ order.id }}</p>
+        <p>Date: {{ order.created_at }}</p>
+    </div>
+    
+    <div class="invoice-details">
+        <p><strong>Customer Name:</strong> {{ order.full_name }}</p>
+        <p><strong>Shipping Address:</strong></p>
+<p>{{ order.address.full_name }}</p>
+<p>{{ order.address.address }}</p>
+{% if order.address.area %}
+<p>{{ order.address.area }}</p>
+{% endif %}
+{% if order.address.landmark %}
+<p>{{ order.address.landmark }}</p>
+{% endif %}
+<p>{{ order.address.city }}, {{ order.address.state }} - {{ order.address.pincode }}</p>
+<p><strong>Phone:</strong> {{ order.address.phone_number }}</p>
+    </div>
+
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order_items %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₹{{ item.price }}</td>
+                    <td>₹{{ item.price }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p><strong>Subtotal: </strong>₹{{ order.subtotal }}</p>
+        <p><strong>Discount: </strong>₹{{ total_discount }}</p> <!-- Now displayed -->
+        <p><strong>Total Amount: </strong>₹{{ order.total_amount }}</p>
+        <p><strong>Payment Method: </strong>{{ payment_method }}</p> <!-- Added -->
+        <p><strong>Payment Status: </strong>{{ payment_status }}</p> <!-- Added -->
+    </div>
+</body>
+</html>

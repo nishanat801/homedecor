@@ -76,6 +76,15 @@
         {% endif %}
     </form>
 </div>
+
+<script>
+    // Prevent the user from going back after logging out
+    window.history.pushState(null, null, window.location.href);
+    window.history.forward();
+    window.onpopstate = function () {
+        window.history.forward();
+    };
+</script>
 {% endblock %}
 
 

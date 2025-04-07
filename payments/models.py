@@ -1,5 +1,6 @@
 from django.db import models
 from Authentication.models import CustomUser
+from decimal import Decimal
 
 class Payment(models.Model):
     name = models.CharField(max_length=100,blank=True)
@@ -15,12 +16,13 @@ class Wallet(models.Model):
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def credit(self, amount):
-        self.balance += amount
+        self.balance = Decimal(self.balance) + Decimal(amount)  # Ensure both are Decimal
         self.save()
         WalletTransaction.objects.create(wallet=self, transaction_type="credit", amount=amount, description="Product Return")
 
     def debit(self, amount):
-        if self.balance >= amount:
+        amount = Decimal(amount)  # Ensure amount is Decimal
+        if Decimal(self.balance) >= amount:
             self.balance -= amount
             self.save()
             WalletTransaction.objects.create(wallet=self, transaction_type="debit", amount=amount, description="Order Payment")
@@ -35,7 +37,7 @@ class WalletTransaction(models.Model):
         ("credit", "Credit"),
         ("debit", "Debit"),
     ]
-
+    # user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True) 
     wallet = models.ForeignKey(Wallet, on_delete=models.CASCADE)
     transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPES)
     amount = models.DecimalField(max_digits=10, decimal_places=2)

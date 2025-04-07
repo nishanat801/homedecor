@@ -4,7 +4,7 @@
 
 {% block content %}
 <style>
-    /* General Reset */
+    {% comment %} /* General Reset */
 body, h1, h2, h3, p, ul, li, a, form, table {
     margin: 0;
     padding: 0;
@@ -24,13 +24,13 @@ body {
     background-color: #222;
     color: #fff;
     padding: 15px 20px;
-}
+} {% endcomment %}
 
-.navbar .container {
+{% comment %} .navbar .container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
+} {% endcomment %}
 
 .navbar .logo {
     font-size: 24px;
@@ -121,19 +121,19 @@ a:hover {
     text-decoration: underline;
 }
 
-/* Footer */
+{% comment %} /* Footer */
 footer {
     background-color: #222;
     color: #fff;
     text-align: center;
     padding: 30px 0;
     margin-top: 300px;
-}
+} {% endcomment %}
 
 </style>
 <div class="container">
     <h1>Add Category</h1>
-    
+
     <!-- Display Error Message -->
     {% if error_message %}
         <p style="color: red;">{{ error_message }}</p>
@@ -142,31 +142,20 @@ footer {
     <!-- Add Category Form -->
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        
+    
         <!-- Category Name Input -->
         <label for="category">Category Name:</label>
         <input type="text" name="category" id="category" placeholder="Enter category name" required>
-
+    
         <!-- Description Input -->
         <label for="description">Description:</label>
         <textarea id="description" name="description" rows="3" placeholder="Enter description"></textarea>
-        
-        {% comment %} <!-- Sub category -->
-        <label for="sub-category">Sub Category</label>
-        <select id="sub-category" name="sub-category" required>
-            <option value="" disabled selected>Select a Sub category</option>
-            {% for subcategory in subcategories %}
-                <option value="{{ subcategory.id }}">{{ subcategory.name }}</option>
-            {% endfor %}
-        </select> {% endcomment %}
-
+    
         <!-- Image Upload -->
         <label for="image">Category Image:</label>
         <input type="file" name="image" id="image" accept="image/*">
-
+    
         <button type="submit">Add Category</button>
     </form>
-</div>
-
 {% endblock %}
 

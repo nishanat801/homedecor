@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sales Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+        }
+
+        .summary p {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .summary strong {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sales Report</h1>
+    <p><strong>Start Date:</strong> {{ start_date }}</p>
+    <p><strong>End Date:</strong> {{ end_date }}</p>
+
+    <h2>Sales Summary</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Amount</th>
+                <th>Discount</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.id }}</td>
+                <td>₹{{ order.total_amount }}</td>
+                <td>₹{{ order.total_discount }}</td>
+                <td>{{ order.created_at|date:"M d, Y" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="summary">
+        <p><strong>Total Orders:</strong> {{ overall_sales_count }}</p>
+        <p><strong>Total Sales Amount:</strong> ₹{{ overall_order_amount }}</p>
+        <p><strong>Total Discount:</strong> ₹{{ overall_discount }}</p>
+        <p><strong>Net Sales:</strong> ₹{{ overall_net_sales }}</p>
+    </div>
+</body>
+</html>

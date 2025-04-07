@@ -80,3 +80,45 @@ def set_default_address(request):
             return JsonResponse({'message': 'Default address updated successfully'}, status=200)
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def address_management(request):
+    """Manage addresses in My Account (Add, Edit, Delete)"""
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    addresses = Address.objects.filter(user=request.user)
+    form = AddressForm()
+
+    if request.method == 'POST':
+        form = AddressForm(request.POST)
+        if form.is_valid():
+            address = form.save(commit=False)
+            address.user = request.user
+            address.save()
+            return redirect('address_management')  # Redirect after saving
+
+    return render(request, 'user/address_management.html', {
+        'addresses': addresses,
+        'form': form
+    })
+def edit_address_management(request, address_id):
+    address = get_object_or_404(Address, id=address_id)
+
+    if request.method == 'POST':
+        form = AddressForm(request.POST, instance=address)
+        if form.is_valid():
+            form.save()
+            return redirect('address:address_management')  # Redirect back to address list after saving
+    else:
+        form = AddressForm(instance=address)
+
+    return render(request, 'user/myaccount_edit_address.html', {'form': form, 'address': address})
+
+
+def delete_address_management(request, address_id):
+    address = get_object_or_404(Address, id=address_id)
+    if request.method == 'POST':
+        address.delete()
+        return redirect('address:address_management')  # Redirect back to address list after deletion
+
+    return render(request, 'user/myaccount_delete_address.html', {'address': address})

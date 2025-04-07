@@ -1,0 +1,231 @@
+{% extends 'header_footer.html' %}
+{% block content %}
+
+<style>
+    /* General Styles */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4ede4; /* Light warm background */
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+    }
+    
+    /* Form Styling */
+    form {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        width: 90%;
+        max-width: 500px;
+        margin: 20px auto;
+    }
+    
+    /* Address Cards */
+    .address-card {
+        background: #fff;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+        position: relative;
+        transition: transform 0.2s ease;
+        border-left: 5px solid #d3b787;
+    }
+    
+    .address-card:hover {
+        transform: scale(1.02);
+        background: #f8f2eb;
+    }
+    
+    .default-address {
+        border-left: 5px solid #b8945e;
+        background-color: #efe2cf;
+    }
+    
+    /* Badge for Default Address */
+    .badge {
+        background: #b8945e;
+        color: white;
+        font-size: 12px;
+        padding: 4px 8px;
+        border-radius: 12px;
+        margin-left: 8px;
+    }
+    
+    /* Buttons */
+    button, .edit-btn, .delete-btn {
+        display: inline-block;
+        padding: 8px 14px;
+        margin: 5px 5px 0 0;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        transition: 0.3s ease;
+    }
+    
+    button {
+        background: #d3b787;
+        color: white;
+    }
+    
+    button:hover {
+        background: #b8945e;
+    }
+    
+    .edit-btn {
+        background: #e8c68b;
+        color: black;
+    }
+    
+    .edit-btn:hover {
+        background: #d1ad74;
+    }
+    
+    .delete-btn {
+        background: #c47a6e;
+        color: white;
+    }
+    
+    .delete-btn:hover {
+        background: #a8665a;
+    }
+    
+    /* See More Button */
+    #see-more-btn {
+        width: 100%;
+        background: #d3b787;
+        color: white;
+        margin-top: 10px;
+    }
+    
+    #see-more-btn:hover {
+        background: #b8945e;
+    }
+    
+    /* Add New Address Button */
+    .add-address-btn {
+        width: 10%;
+        background: #caa878;
+        color: white;
+        margin-top: 15px;
+        
+    }
+    
+    .add-address-btn:hover {
+        background: #b8945e;
+    }
+    
+    /* Address Form */
+    #address-form-section {
+        display: none;
+        background: white;
+        padding: 20px;
+        margin: 20px auto;
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        width: 90%;
+        max-width: 500px;
+    }
+    
+    .address-form input,
+    .address-form select,
+    .address-form button {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border: 1px solid #d3b787;
+        border-radius: 6px;
+    }
+    
+    .address-form label {
+        font-size: 14px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 600px) {
+        .address-card {
+            padding: 12px;
+        }
+    
+        button {
+            width: 100%;
+        }
+    
+        .edit-btn, .delete-btn {
+            width: 48%;
+        }
+    }
+    
+</style>
+
+<h2>Manage Addresses</h2>
+
+<!-- List of Addresses -->
+{% for address in addresses %}
+<div class="address-card">
+    <p><strong>{{ address.full_name }}</strong></p>
+    <p>{{ address.address }}, {{ address.city }}, {{ address.state }} - {{ address.pincode }}</p>
+    <p>{{ address.phone_number }}</p>
+
+    <!-- Edit and Delete -->
+    <a href="{% url 'address:edit_address_management' address.id %}" class="edit-btn">Edit</a>
+<a href="{% url 'address:delete_address_management' address.id %}" class="delete-btn">Delete</a>
+</div>
+{% endfor %}
+
+{% comment %} <!-- Add New Address -->
+<button class="add-address-btn" onclick="showAddressForm()">+ Add New Address</button>
+
+<!-- Address Form -->
+<div id="address-form-section" style="display: none;">
+    <h2>Add New Address</h2>
+    <form method="POST" action="{% url 'address:address_management' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Address</button>
+        <button type="button" onclick="cancelAddressForm()">Cancel</button>
+    </form>
+</div> {% endcomment %}
+
+
+
+<script>
+    function toggleAddresses(event) {
+        event.preventDefault();
+        document.getElementById('remaining-addresses').style.display = 'block';
+        document.getElementById('see-more-btn').style.display = 'none';
+    }
+
+    function showAddressForm(event) {
+        event.preventDefault();
+        document.getElementById('address-form-section').style.display = 'block';
+    }
+
+    function setDefaultAddress(radio) {
+        fetch("{% url 'address:set_default' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ address_id: radio.value })
+        }).then(response => {
+            if (response.ok) {
+                location.reload();
+            }
+        });
+    }
+
+    function cancelAddressForm() {
+        document.getElementById('address-form-section').style.display = 'none';  // Hide address form
+        document.querySelector('form').style.display = 'block';  // Show the address selection form
+    }
+</script>
+{% endblock %}

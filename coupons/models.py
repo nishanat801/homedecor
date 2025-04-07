@@ -50,6 +50,8 @@ class CouponUsage(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
     used_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)  # Track if the coupon is used
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Store applied discount amount
     final_total = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     class Meta:

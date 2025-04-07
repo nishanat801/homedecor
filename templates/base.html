@@ -3,28 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Home Decor{% endblock %}</title>
+    <title>{% block title %}HomeDecor Admin{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
-        /* General Reset */
-        body, h1, h2, h3, p, ul, li, a {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-            text-decoration: none;
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #3498db;
+            --background-light: #f4f6f7;
+            --text-color: #2c3e50;
+            --white: #ffffff;
+            --transition: all 0.3s ease;
         }
 
-        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f9f9f9;
-            color: #333;
+            font-family: 'Inter', 'Arial', sans-serif;
+            background-color: var(--background-light);
+            color: var(--text-color);
             line-height: 1.6;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
 
-        /* Navbar */
+        /* Navbar Styles */
         .navbar {
             background-color: #a57256;
             color: #fff;
@@ -32,45 +40,121 @@
         }
 
         .navbar .container {
-            width: 90%;
-            max-width: 1200px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 15px 5%;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
         .navbar .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #fff;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar .logo i {
+            font-size: 1.8rem;
         }
 
         .navbar .nav-links {
             display: flex;
             align-items: center;
+            gap: 20px;
         }
 
-        .navbar .nav-links li {
-            display: inline;
-            margin-right: 20px;
+        .navbar .nav-links > li {
+            position: relative;
         }
 
-        .navbar .nav-links a {
-            color: #fff;
-            transition: color 0.3s;
+        .navbar .nav-links > li > a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        .navbar .nav-links a:hover {
-            color: #ff9900;
+        .navbar .nav-links > li > a i {
+            font-size: 1.1rem;
+        }
+
+        .navbar .nav-links > li > a:hover {
+            color: var(--white);
+        }
+
+        .navbar .nav-links > li > a.active {
+            color: var(--accent-color);
+        }
+
+        /* Submenu Styles */
+        .navbar .nav-links > li > ul {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: var(--white);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            min-width: 200px;
+            padding: 10px 0;
+            z-index: 1000;
+        }
+
+        .navbar .nav-links > li:hover > ul {
+            display: block;
+        }
+
+        .navbar .nav-links > li > ul li {
+            padding: 8px 15px;
+        }
+
+        .navbar .nav-links > li > ul li a {
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+
+        .navbar .nav-links > li > ul li a:hover {
+            color: var(--accent-color);
         }
 
         /* Main Content */
         .container {
             width: 90%;
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 20px auto;
-            flex: 1; /* Allow the container to grow and push footer to bottom */
+            flex: 1;
+        }
+
+        /* Messages */
+        .messages {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1100;
+            width: 300px;
+        }
+
+        .alert {
+            margin-bottom: 10px;
+            padding: 12px 15px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
         }
 
         /* Footer */
@@ -83,93 +167,38 @@
             flex-shrink: 0; /* Prevent footer from shrinking */
         }
 
-        /* Login Form */
-        .login-container {
-            background: #ffffff;
-            margin-top: 200px;
-            padding: 20px 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            margin: 0 auto;
-        }
-
-        .login-container h1 {
-            margin-bottom: 20px;
-            font-size: 24px;
-            color: #333333;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-            text-align: left;
-        }
-
-        .form-group label {
-            font-weight: bold;
-            color: #333333;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #cccccc;
-            border-radius: 5px;
-        }
-
-        .form-group input:focus {
-            border-color: #007bff;
-            outline: none;
-        }
-
-        .form-group .error {
-            color: red;
-            font-size: 14px;
-        }
-
-        .login-btn {
-            width: 100%;
-            background-color: #a57256;
-            color: #ffffff;
-            padding: 10px 0;
-            border: none;
-            border-radius: 5px;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        .login-btn:hover {
-            background-color: #0056b3;
-        }
-
-        .error-message {
-            color: red;
-            margin-top: 15px;
-            font-size: 14px;
-        }
-
         /* Responsive Design */
-        @media screen and (max-width: 768px) {
-            .navbar .container {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
+        @media screen and (max-width: 1024px) {
             .navbar .nav-links {
-                flex-direction: column;
-                margin-top: 10px;
+                display: none;
             }
 
-            .navbar .nav-links li {
-                margin-right: 0;
-                margin-bottom: 10px;
+            .navbar .mobile-toggle {
+                display: block;
+                color: var(--white);
+                font-size: 1.5rem;
+                cursor: pointer;
             }
-            
+        }
+
+        /* Alert Colors */
+        .alert-success { background-color: #d4edda; color: #155724; }
+        .alert-danger { background-color: #f8d7da; color: #721c24; }
+        .alert-warning { background-color: #fff3cd; color: #856404; }
+        .alert-info { background-color: #d1ecf1; color: #0c5460; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--background-light);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -177,20 +206,64 @@
     <header>
         <nav class="navbar">
             <div class="container">
-                <a href="{% url 'home' %}" class="logo">HomeDecor</a>
+                <a href="{% url 'home' %}" class="logo">
+                    <i class="ri-home-smile-line"></i>
+                    HomeDecor
+                </a>
                 <ul class="nav-links">
-                    <li><a href="{% url 'products:product_list' %}">Products</a></li>
-                    <li><a href="{% url 'category_list' %}">Category</a></li>
-                    <li><a href="{% url 'orders:admin_orders' %}">Orders</a></li>
-                    <li><a href="{% url 'coupon_list' %}">Coupon Management</a></li>
-                    <li><a href="{% url 'user:user_profile_list'%}">User Profile</a></li>
-                    <li><a href="Authentication:admin_login">Logout</a></li>
-                    {% if user.is_authenticated %}
-                        <li><a href="Authentication:admin_login">Logout</a></li>
-                    {% else %}
-                        <li><a href="{% url 'Authentication:admin_login' %}">Logout</a></li>
-                    {% endif %}
+                    <li>
+                        <a href="{% url 'sales_dashboard' %}">
+                            <i class="ri-pie-chart-line"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'products:product_list' %}">
+                            <i class="ri-product-hunt-line"></i>
+                            Products
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'category_list' %}">
+                            <i class="ri-grid-line"></i>
+                            Category
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'orders:admin_orders' %}">
+                            <i class="ri-shopping-basket-line"></i>
+                            Orders
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'coupon_list' %}">
+                            <i class="ri-coupon-line"></i>
+                            Coupons
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'user:user_profile_list' %}">
+                            <i class="ri-user-line"></i>
+                            Users
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="user-menu">
+                            <i class="ri-user-settings-line"></i>
+                            Account
+                        </a>
+                        <ul>
+                            {% if user.is_authenticated %}
+                                <li><a href="{% url 'Authentication:admin_logout' %}">Logout</a></li>
+                            {% else %}
+                                <li><a href="{% url 'Authentication:admin_login' %}">Login</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
                 </ul>
+                <div class="mobile-toggle">
+                    <i class="ri-menu-line"></i>
+                </div>
             </div>
         </nav>
     </header>
@@ -199,11 +272,16 @@
     <div class="messages">
         {% for message in messages %}
             <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {% if message.tags == 'success' %}<i class="ri-checkbox-circle-line"></i>{% endif %}
+                {% if message.tags == 'error' %}<i class="ri-error-warning-line"></i>{% endif %}
+                {% if message.tags == 'warning' %}<i class="ri-alert-line"></i>{% endif %}
+                {% if message.tags == 'info' %}<i class="ri-information-line"></i>{% endif %}
                 {{ message }}
             </div>
         {% endfor %}
     </div>
-{% endif %}
+    {% endif %}
+
     <main>
         <div class="container">
             {% block content %}
@@ -214,9 +292,8 @@
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 HomeDecor. All Rights Reserved.</p>
+            <p>&copy; 2025 HomeDecor Admin. All Rights Reserved.</p>
         </div>
     </footer>
 </body>
 </html>
-

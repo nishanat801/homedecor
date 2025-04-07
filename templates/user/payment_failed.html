@@ -1,0 +1,67 @@
+{% extends 'header_footer.html' %}
+
+{% block title %}payment failed - Home Decor{% endblock %}
+
+{% block content %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background-color: #f8f8f8;
+        }
+        .container {
+            max-width: 500px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            margin: auto;
+        }
+        h2 {
+            color: red;
+        }
+        p {
+            font-size: 16px;
+            color: #333;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .retry-btn {
+            background-color: #ff5722;
+        }
+        .shop-btn {
+            background-color: #2d88ff;
+        }
+        .btn:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Payment Failed</h2>
+        <p>We were unable to process your payment. Please try again.</p>
+        
+        <p><strong>Order ID:</strong> {{ order_id }}</p>
+
+        {% if order_id %}
+    <a href="{% url 'payments:retry_payment' order_id %}" class="btn retry-btn">Retry Payment</a>
+{% else %}
+    <p>Order ID not found. Please contact support.</p>
+{% endif %}
+        <a href="{% url 'products_user' %}" class="btn shop-btn">Continue Shopping</a>
+    </div>
+
+</body>
+{%endblock%}

@@ -14,6 +14,8 @@ urlpatterns = [
     path('<int:category_id>/', views.category_with_products, name='category_products'),
 
     path("search_products/", views.search_products, name="search_products"),
+    path('unlist/<int:product_id>/', views.unlist_product, name='unlist_product'),
+    path('list/<int:product_id>/', views.list_product, name='list_product'),
 
 ]
 if settings.DEBUG:

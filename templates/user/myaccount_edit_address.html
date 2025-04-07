@@ -1,0 +1,13 @@
+{% extends 'header_footer.html' %}
+
+{% block content %}
+<h2>Edit Address</h2>
+<form method="POST" action="{% url 'address:edit_address_management' address.id %}">
+    {% csrf_token %}
+    {{ form.as_p }}  <!-- Render form fields -->
+
+    <button type="submit" class="save-btn">Save Address</button>
+</form>
+
+<a href="{% url 'address:address_management' %}">Back to Address List</a>
+{% endblock %}

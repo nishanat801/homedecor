@@ -1,0 +1,134 @@
+{% extends 'header_footer.html' %}
+
+{% block title %}Edit Reviews{% endblock %}
+
+{% block content %}
+{% load static %}
+<style>
+    .edit-review-container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 25px;
+        background: #ffffff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+    }
+    
+    .edit-review-title {
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #333;
+    }
+    
+    .edit-review-title span {
+        color: #007bff;
+    }
+    
+    .edit-review-form {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .edit-review-form label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+        color: #444;
+    }
+    
+    .edit-review-form input,
+    .edit-review-form textarea,
+    .edit-review-form select {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    
+    .edit-review-form textarea {
+        height: 100px;
+        resize: vertical;
+    }
+    
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 15px;
+    }
+    
+    .save-btn {
+        background: #28a745;
+        color: white;
+        padding: 10px 15px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    
+    .save-btn:hover {
+        background: #218838;
+    }
+    
+    .cancel-btn {
+        background: #dc3545;
+        color: white;
+        padding: 10px 15px;
+        font-size: 16px;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: 0.3s;
+    }
+    
+    .cancel-btn:hover {
+        background: #c82333;
+    }
+    .rating-options {
+        display: flex;
+        gap: 15px;
+    }
+    
+    .rating-label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    
+</style>
+<div class="edit-review-container">
+    <h2 class="edit-review-title">Edit Review for <span>{{ review.product.name }}</span></h2>
+
+    <form method="POST" class="edit-review-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.rating.id_for_label }}">Rating:</label>
+            <div class="rating-options">
+                {% for radio in form.rating %}
+                    <label class="rating-label">{{ radio.tag }} {{ radio.choice_label }}</label>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.review_text.id_for_label }}">Review:</label>
+            {{ form.review_text }}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="save-btn">Save Changes</button>
+            <a href="{% url 'my_reviews' %}" class="cancel-btn">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

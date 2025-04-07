@@ -81,17 +81,15 @@
     }
 
     .payment-option {
-        border: 1px solid #e5e5e5;
-        border-radius: 8px;
-        padding: 16px;
-        margin-bottom: 16px;
         cursor: pointer;
-        transition: all 0.3s;
+        padding: 10px;
+        margin: 5px;
+        border: 1px solid #ccc;
+        display: inline-block;
     }
-
-    .payment-option.selected {
-        border-color: #000;
-        background-color: #f8f9fa;
+    
+    .selected {
+        background-color: #f1f1f1;
     }
 
     .order-item {
@@ -172,6 +170,23 @@
         background-color: #0056b3;
     }
 
+    .wallet-btn-section {
+        margin-top: 20px;
+    }
+    
+    .wallet-btn, .razorpay-btn, .place-order-btn {
+        width: 100%;
+        padding: 10px 20px;
+        background: #b8945e;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .wallet-btn:hover, .razorpay-btn:hover, .place-order-btn:hover {
+        background: #b8945e;
+    }
+
 
     @media (max-width: 768px) {
         .checkout-grid {
@@ -242,37 +257,50 @@
                     </div>
                 </div>
     
-                <!-- Payment Method Section -->
-                <div class="checkout-card">
-                    <div class="section-heading">
-                        <i class="fas fa-credit-card"></i> Payment Method
-                    </div>
-                    <div class="payment-methods">
-                        <div class="payment-option" id="cod-option">
-                            <label>
-                                <input type="radio" name="payment_method" value="cod">
-                                <i class="fas fa-money-bill-wave"></i>
-                                <div class="payment-details">
-                                    <p class="name">Cash on Delivery</p>
-                                    <p>Pay when you receive</p>
-                                </div>
-                            </label>
-                        </div>
-                        
-                        <div class="payment-option" id="razorpay-option">
-                            <label>
-                                <input type="radio" name="payment_method" value="razorpay">
-                                <i class="fas fa-credit-card"></i>
-                                <div class="payment-details">
-                                    <p class="name">Razorpay</p>
-                                    <p>Pay securely with Razorpay</p>
-                                </div>
-
-
-                            </label>
-                        </div>
-                    </div>
+              <!-- Payment Method Section -->
+<div class="checkout-card">
+    <div class="section-heading">
+        <i class="fas fa-credit-card"></i> Payment Method
+    </div>
+    <div class="payment-methods">
+        <!-- Cash on Delivery Option -->
+        <div class="payment-option" id="cod-option">
+            <label>
+                <input type="radio" name="payment_method" value="cod">
+                <i class="fas fa-money-bill-wave"></i>
+                <div class="payment-details">
+                    <p class="name">Cash on Delivery</p>
+                    <p>Pay when you receive</p>
                 </div>
+            </label>
+        </div>
+        
+        <!-- Razorpay Option -->
+        <div class="payment-option" id="razorpay-option">
+            <label>
+                <input type="radio" name="payment_method" value="razorpay">
+                <i class="fas fa-credit-card"></i>
+                <div class="payment-details">
+                    <p class="name">Razorpay</p>
+                    <p>Pay securely with Razorpay</p>
+                </div>
+            </label>
+        </div>
+
+        <!-- Wallet Option -->
+        <div class="payment-option" id="wallet-option">
+            <label>
+                <input type="radio" name="payment_method" value="wallet">
+                <i class="fas fa-wallet"></i>
+                <div class="payment-details">
+                    <p class="name">Wallet</p>
+                    <p>Pay using your wallet balance</p>
+                </div>
+            </label>
+        </div>
+    </div>
+</div>
+
 
                 {% if available_coupons %}
     <div class="coupon-list-container">
@@ -328,10 +356,12 @@
     <p>Subtotal: <span id="subtotal-amount">₹{{ subtotal|floatformat:2 }}</span></p>
 
     <!-- Discount row (hidden initially if no coupon applied) -->
-    <p class="discount" id="discount-row" style="display: {% if applied_coupon %}block{% else %}none{% endif %};">
-        Discount (<span id="coupon-code-text">{% if applied_coupon %}{{ applied_coupon.code }}{% endif %}</span>):
+    {% if applied_coupon %}
+    <p class="discount" id="discount-row">
+        Discount (<span id="coupon-code-text">{{ applied_coupon.code }}</span>):
         <span id="discount-amount">- ₹{{ discount_amount|floatformat:2 }}</span>
     </p>
+{% endif %}
 
     <hr>
 
@@ -352,13 +382,17 @@
 
 <!-- CSRF Token for Fetch Request -->
 <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
-            
-                      <!-- Payment Button Section -->
-                    <button type="submit" id="place-order-btn" class="place-order-btn">Place Order</button>
-                    <div id="razorpay-btn-section" style="display: none;">
-                        <button type="button" id="proceed-to-pay" class="razorpay-btn">Proceed to Pay</button>
-                    </div>
-                </div>
+
+<!-- Payment Method Section -->
+<button type="submit" id="place-order-btn" class="place-order-btn">Place Order</button>
+
+<div id="razorpay-btn-section" style="display: none;">
+    <button type="button" id="proceed-to-pay" class="razorpay-btn">Proceed to Pay</button>
+</div>
+
+<div id="wallet-btn-section" style="display: none;">
+    <button type="button" id="pay-with-wallet" class="wallet-btn">Pay with Wallet</button>
+</div>
 
 <script>
 
@@ -460,14 +494,34 @@ document.querySelectorAll('.payment-option').forEach(option => {
         let radioInput = option.querySelector('input[type="radio"]');
         radioInput.checked = true; // Ensure the radio button is checked
 
-        // Show/hide Razorpay button based on selection
+        // Show/hide payment buttons based on selection
         const razorpayBtnSection = document.getElementById('razorpay-btn-section');
+        const walletBtnSection = document.getElementById('wallet-btn-section');
+        const placeOrderBtn = document.getElementById('place-order-btn');
+
+        // Initially, both buttons are visible
+        placeOrderBtn.style.display = 'block';
+        razorpayBtnSection.style.display = 'none';
+        walletBtnSection.style.display = 'none';
+
         if (radioInput.value === 'cod') {
+            // If COD is selected, show both buttons
             razorpayBtnSection.style.display = 'none';
+            walletBtnSection.style.display = 'none';
         } else if (radioInput.value === 'razorpay') {
+            // If Razorpay is selected, show Razorpay button and hide the Place Order button
             razorpayBtnSection.style.display = 'block';
+            placeOrderBtn.style.display = 'none';
+        } else if (radioInput.value === 'wallet') {
+            // If Wallet is selected, show Wallet button and hide the Place Order button
+            walletBtnSection.style.display = 'block';
+            placeOrderBtn.style.display = 'none';
         }
     });
+});
+
+document.getElementById("pay-with-wallet").addEventListener("click", function () {
+    window.location.href = "{% url 'payments:wallet_payment' %}";
 });
 
     // Proceed to Pay Button Click Event

@@ -13,12 +13,20 @@ class Order(models.Model):
         ("Shipped", "Shipped"),
         ("Delivered", "Delivered"),
         ("Cancelled", "Cancelled"),
+        ('Pending Payment', 'Pending Payment'),
+        
+        
     ]
     PAYMENT_STATUS_CHOICES = [
         ("Pending", "Pending"),
         ("Completed", "Completed"),
         ("Failed", "Failed"),
         ("Refunded", "Refunded"),
+    ]
+    PAYMENT_METHOD_CHOICES = [
+        ("Wallet", "Wallet"),
+        ("Razorpay", "Razorpay"),
+        ("Cash on Delivery", "Cash on Delivery"),
     ]
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -31,7 +39,13 @@ class Order(models.Model):
     razorpay_payment_id = models.CharField(max_length=100, blank=True, null=True)
     razorpay_signature = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Total price of the order before discount
     coupon = models.ForeignKey(Coupon,on_delete=models.CASCADE,blank=True,null=True)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Total price of the order after discount
+    total_discount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Total discount applied to the order
+    payment_method = models.CharField(
+        max_length=20, choices=PAYMENT_METHOD_CHOICES, default="Cash on Delivery"
+    )
 
     def save(self, *args, **kwargs):
         if not self.tracking_number or self.tracking_number == "PENDING":
@@ -51,6 +65,7 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)  # Number of items ordered
     price = models.DecimalField(max_digits=10, decimal_places=2,default=0.00)  # Price per item at purchase time
+    subtotal=models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Total price for the item after discount
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Discount per item
     final_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # Final price after discount
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Pending")

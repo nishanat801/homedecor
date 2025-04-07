@@ -6,273 +6,347 @@
  <style>
    
 
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.order-card {
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    margin-bottom: 20px;
-    transition: transform 0.3s ease-in-out;
-}
-
-.order-card:hover {
-    transform: scale(1.02);
-}
-
-h3, h4 {
-    color: #333;
-    margin-bottom: 10px;
-}
-
-p {
-    color: #555;
-    margin: 5px 0;
-}
-
-.items {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    padding: 15px 0;
-}
-
-.items li {
-    list-style: none;
-    background: #f9f9f9;
-    padding: 15px;
-    border-radius: 8px;
-    text-align: center;
-    width: 220px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.items img {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 5px;
-    display: block;
-    margin: 0 auto 10px;
-}
-
-.cancel-btn, .reorder-btn,.return-button {
-    background-color: red;
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    cursor: pointer;
-    margin-top: 10px;
-    display: block;
-    width: 100%;
-    border-radius: 5px;
-}
-
-.cancel-btn:hover {
-    background-color: darkred;
-}
-
-.reorder-btn {
-    background-color: green;
-}
-
-.reorder-btn:hover {
-    background-color: darkgreen;
-}
-.return-button {
-    background-color:green;
-}
-
-.cancelled-label {
-    color: red;
-    font-weight: bold;
-    display: block;
-    margin-top: 10px;
-}
-
-.no-orders {
-    text-align: center;
-    color: #999;
-    font-size: 18px;
-    margin-top: 50px;
-}
-</style>
+    <style>
+        :root {
+            --primary: #3a86ff;
+            --success: #38b000;
+            --danger: #d90429;
+            --warning: #ff9e00;
+            --light-gray: #f8f9fa;
+            --border-radius: 8px;
+            --shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            --transition: 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        
+        /* Page Title */
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2d3748;
+            border-bottom: 2px solid #eaeaea;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        /* Order Card */
+        .order-card {
+            background: #fff;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .order-number {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .order-date {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* Order Items */
+        .order-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        
+        .item-card {
+            background: var(--light-gray);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        
+        .item-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .item-image img {
+            width: 100%;
+            height:280px;
+            object-fit: cover;
+        }
+        
+        .item-details {
+            padding: 12px;
+        }
+        
+        .item-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .item-meta {
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        /* Status Labels */
+        .order-status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-delivered { background: #e3fcef; color: var(--success); }
+        .status-processing { background: #e6efff; color: var(--primary); }
+        .status-shipped { background: #fff2cc; color: var(--warning); }
+        .status-cancelled { background: #fde2e2; color: var(--danger); }
+        .status-refunded { background: #e2e2e2; color: #666; }
+        
+        /* Buttons */
+        .item-actions {
+            margin-top: 10px;
+            display: flex !important;
+            gap: 8px;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
+        .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: inline-block !important; /* Ensure buttons always show */
+            opacity: 1 !important; /* Make sure it's fully visible */
+            visibility: visible !important;
+        }
+        
+        .btn-cancel { background: var(--danger); color:  black; }
+        .btn-cancel { background: #bf0014; }
+        
+        .btn-reorder { background: var(--success); color:  black; }
+        .btn-reorder { background: #2c9000; color:  black;}
+        
+        {% comment %} .btn-invoice { background: var(--primary); color: black; } {% endcomment %}
+        .btn-invoice { background: #2a76eb;color:  black;}
+        
+        /* Empty Orders Message */
+        .no-orders {
+            text-align: center;
+            background: white;
+            padding: 50px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            color: #718096;
+            font-size: 18px;
+        
+    </style>
 </head>
 <body>
     <div class="container">
+        <h1 class="page-title">My Orders</h1>
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <p class="{{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
         {% for order in orders %}
         <div class="order-card">
-            <h3>Order #{{ order.order_number }}</h3>
-            <ul class="items">
+            <div class="order-header">
+                <div class="order-number">Order #{{ order.order_number }}</div>
+                <div class="order-date">March 22, 2025</div> <!-- This would be dynamic in your template -->
+            </div>
+            
+            <div class="order-items">
                 {% for item in order.items %}
-                <li>
-                    <img src="{{ item.product_image }}" alt="{{ item.product_name }}">
-                    <p><strong>{{ item.product_name }}</strong></p>
-                    <p>Quantity: {{ item.quantity }}</p>
-                    <p>Price: {{ item.price }}</p>
-                    <p>Status: <span class="order-status">{{ item.status }}</span></p>  <!-- ✅ Status updates dynamically -->
-    
-                    {% if item.status == "Cancelled"%}
-                        <span class="cancelled-label">Cancelled</span>
-                        <form action="{% url 'orders:reorder_item' item.id %}" method="POST">
-                            {% csrf_token %}
-                            <button type="submit" class="reorder-btn">Order Again</button>
-
-                            {% elif item.status == "Delivered" %}
-                            <form action="{% url 'orders:return_product' item.id %}" method="POST">
-                                {% csrf_token %}
-                                <button type="submit" class="return-button" data-item-id="{{ item.id }}">Request Return</button>
-                            </form>
-
-                            {% elif item.status == "Requested for Return" %}
-                                <span class="return-requested-label">Return Requested</span>
-                                {% elif item.status == "Returned" %}
-                                <!-- Show "Order Again" button for returned items -->
+                <div class="item-card">
+                    <div class="item-image">
+                        <img src="{{ item.product_image }}" alt="{{ item.product_name }}">
+                    </div>
+                    <div class="item-details">
+                        <h3 class="item-title">{{ item.product_name }}</h3>
+                        
+                        <div class="item-meta">
+                            <span class="item-meta-label">Quantity:</span>
+                            <span class="item-meta-value">{{ item.quantity }}</span>
+                        </div>
+                        
+                        <div class="item-meta">
+                            <span class="item-meta-label">Price:</span>
+                            <span class="item-meta-value">{{ item.price }}</span>
+                        </div>
+                        
+                        <div class="item-meta">
+                            <span class="item-meta-label">Status:</span>
+                            <span class="order-status 
+                                {% if item.status == 'Delivered' %}status-delivered
+                                {% elif item.status == 'Processing' %}status-processing
+                                {% elif item.status == 'Shipped' %}status-shipped
+                                {% elif item.status == 'Cancelled' %}status-cancelled
+                                {% elif item.status == 'Returned' %}status-returned
+                                {% elif item.status == 'Refunded' %}status-refunded
+                                {% elif item.status == 'Requested for Return' %}status-return-requested
+                                {% elif item.status == 'Requested for Refund' %}status-refund-requested
+                                {% endif %}">
+                                {{ item.status }}
+                            </span>
+                        </div>
+                        
+                        <div class="item-actions">
+                            <a href="{% url 'orders:download_invoice' order.id %}" class="btn btn-invoice">Download Invoice</a>
+                            
+                            {% if item.status == "Cancelled" %}
+                                {% comment %} <span class="cancelled-label">Cancelled</span> {% endcomment %}
                                 <form action="{% url 'orders:reorder_item' item.id %}" method="POST">
                                     {% csrf_token %}
-                                    <button type="submit" class="reorder-btn">Order Again</button>
+                                    <button type="submit" class="btn btn-reorder">Order Again</button>
                                 </form>
-    
-                                {% else %}
-                                <form action="{% url 'orders:cancel_order' item.id %}" method="POST">
+                        
+                            {% elif item.status == "Delivered" %}
+                                <form action="{% url 'orders:return_product' item.id %}" method="POST">
                                     {% csrf_token %}
-                                    <button type="submit" class="cancel-btn">Cancel Item</button>
+                                    <button type="submit" class="btn btn-return" data-item-id="{{ item.id }}">Request Return</button>
                                 </form>
-                                {% endif %}
-                </li>
+                        
+                            {% elif item.status == "Requested for Return" %}
+                                <span class="return-requested-label">Return Requested</span>
+                        
+                            {% elif item.status == "Requested for Refund" %}
+                                <span class="refund-requested-label">Refund Requested</span>
+                        
+                            {% elif item.status == "Returned" or item.status == "Returned & Refunded" or item.status == "Refunded" %}
+                                <form action="{% url 'orders:reorder_item' item.id %}" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-reorder">Order Again</button>
+                                </form>
+                        
+                            {% else %}
+                                <form action="{% url 'orders:cancel_order' item.id %}" method="POST" class="cancel-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-cancel">Cancel Item</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
                 {% endfor %}
-    </ul>
-</div>
-{% empty %}
-    <p class="no-orders">No orders found.</p>
-{% endfor %}
-</div>
-  {% if messages %}
-<div class="messages">
-    {% for message in messages %}
-    <p class="{{ message.tags }}">{{ message }}</p>
-    {% endfor %}
-</div>
-{% endif %}
-</body>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-orders">
+            <i>📦</i>
+            <p>You haven't placed any orders yet.</p>
+        </div>
+        {% endfor %}
+    </div>
 
-
-<script>
-    {% comment %} function returnProduct(orderItemId) {
-        if (confirm("Are you sure you want to return this product?")) {
-            fetch(`/return-product/${orderItemId}/`, {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": "{{ csrf_token }}"
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert("Product return request submitted!");
-                    location.reload();
-                } else {
-                    alert("Error: " + data.error);
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                alert("Failed to process return request.");
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".btn-return").forEach((button) => {
+                button.addEventListener("click", function (event) {
+                    event.preventDefault();
+            
+                    let confirmReturn = confirm("Are you sure you want to request a return for this product?");
+                    if (!confirmReturn) return;
+            
+                    let form = this.closest("form");
+                    let url = form.action;
+            
+                    fetch(url, {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": form.querySelector("input[name='csrfmiddlewaretoken']").value,
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message); // Show success message
+                            location.reload(); // Reload the page to reflect changes
+                        } else {
+                            alert(data.message);  // Show error message
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("Failed to request return.");
+                    });
+                });
             });
-        }
-    } {% endcomment %}
-
-
-    document.querySelectorAll(".cancel-btn").forEach((button) => {
-        button.addEventListener("click", function (event) {
-            event.preventDefault();
-    
-            let confirmCancel = confirm("Are you sure you want to cancel this product?");
-            if (!confirmCancel) return;
-    
-            let form = this.closest("form");
-            let url = form.action;
-            let statusElement = form.closest("li").querySelector(".order-status"); 
-            let returnButton = form.closest("li").querySelector(".return-button"); 
-    
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": form.querySelector("input[name='csrfmiddlewaretoken']").value,
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert("Product has been cancelled successfully!");
-                    
-                    statusElement.textContent = "Cancelled";
-                    statusElement.classList.add("cancelled-label");
-    
-                    // ✅ Hide cancel button after cancellation
-                    form.querySelector(".cancel-btn").style.display = "none";
-    
-                    // ✅ Hide return button (Cancelled items can't be returned)
-                    if (returnButton) returnButton.style.display = "none";
-                } else {
-                    alert("Error: " + data.error);
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                alert("Failed to cancel the order.");
+        
+            document.querySelectorAll(".btn-cancel").forEach((button) => {
+                button.addEventListener("click", function (event) {
+                    event.preventDefault();
+        
+                    let confirmCancel = confirm("Are you sure you want to cancel this product?");
+                    if (!confirmCancel) return;
+        
+                    let form = this.closest("form");
+                    let url = form.action;
+        
+                    fetch(url, {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": form.querySelector("input[name='csrfmiddlewaretoken']").value,
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message); // Show success message
+                            location.reload(); // Reload the page to reflect changes
+                        } else {
+                            alert("Error: " + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("Failed to cancel the order.");
+                    });
+                });
             });
         });
-    });
-    
-    document.querySelectorAll(".return-button").forEach((button) => {
-        button.addEventListener("click", function (event) {
-            event.preventDefault();
-    
-            let confirmReturn = confirm("Are you sure you want to request a return for this product?");
-            if (!confirmReturn) return;
-    
-            let itemElement = this.closest("li");
-            let statusElement = itemElement.querySelector(".order-status"); // Find the status text
-            let itemId = this.dataset.itemId;  // Get the item ID
-    
-            fetch(`/return-product/${itemId}/`, {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": "{{ csrf_token }}",  // Ensure CSRF token is correctly passed
-                },
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Server responded with an error: " + response.statusText);
-                }
-                return response.json();  // Parse the response body if successful
-            })
-            .then(data => {
-                if (data.success) {
-                    alert("Return request submitted successfully!");
-    
-                    // ✅ Update Status Text to "Requested for Return"
-                    statusElement.textContent = "Requested for Return";
-                    statusElement.classList.add("return-requested");
-    
-                    // ✅ Change Button Text to "Return Requested" and Disable It
-                    this.textContent = "Return Requested";
-                    this.disabled = true;
-                } else {
-                    alert("Error: " + data.error);  // Display error message from server if available
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                alert("Failed to process return request. Error: " + error.message);  // Improved error message
-            });
-        });
-    });
+        
+        
+        
 </script>
 {% endblock%}

@@ -1,0 +1,592 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <title>Sales Dashboard</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --info: #4895ef;
+            --warning: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        .dashboard-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .date-filter {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background-color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .date-filter label {
+            font-weight: 500;
+            color: var(--gray);
+        }
+        
+        .date-filter select, .date-filter input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: var(--transition);
+        }
+        
+        .date-filter select:focus, .date-filter input:focus {
+            border-color: var(--primary);
+        }
+        
+        .quick-links {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .quick-link {
+            padding: 6px 12px;
+            background-color: white;
+            border: 1px solid #eaeaea;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .quick-link:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .quick-link.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .metrics-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metric-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: var(--transition);
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .metric-title {
+            font-size: 16px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+        
+        .metric-value {
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        
+        .metric-trend {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+        
+        .trend-up {
+            color: #22c55e;
+        }
+        
+        .trend-down {
+            color: #ef4444;
+        }
+        
+        .data-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+        }
+        
+        .data-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .data-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .export-options {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .export-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background-color: var(--light);
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .export-btn:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .export-btn.pdf {
+            color: #e03131;
+        }
+        
+        .export-btn.excel {
+            color: #2b8a3e;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background-color: #f8f9fa;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        th {
+            font-weight: 600;
+            color: var(--gray);
+        }
+        
+        tr:hover {
+            background-color: #f9fafb;
+        }
+        
+        .status-pill {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-completed {
+            background-color: #e6f7e9;
+            color: #2b8a3e;
+        }
+        
+        .status-pending {
+            background-color: #fff3e0;
+            color:rgb(242, 209, 192);
+        }
+
+
+
+        .best-selling-container {
+            display: flex;  /* Enables horizontal layout */
+            gap: 20px;  /* Adds spacing between the boxes */
+            justify-content: space-between; /* Distributes evenly */
+            flex-wrap: wrap;  /* Ensures responsiveness */
+        }
+        
+        .best-selling {
+            flex: 1;  /* Makes all sections equal width */
+            min-width: 300px;  /* Ensures proper spacing on smaller screens */
+            max-width: 32%;  /* Ensures they fit in one row */
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            text-align: center; /* Centers the content */
+        }
+        
+        /* Ensure tables take full width inside each card */
+        .best-selling table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .best-selling th {
+            background: #007bff;
+            color: white;
+            font-weight: bold;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .best-selling td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+
+
+        .search-form {
+            margin-top: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .search-form input {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            width: 250px;
+        }
+        
+        .search-form button {
+            padding: 8px 15px;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        
+        .page-link {
+            padding: 5px 10px;
+            border: 1px solid #007bff;
+            color: #007bff;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        
+        .page-link:hover {
+            background: #007bff;
+            color: white;
+        }
+        
+        .current-page {
+            font-weight: bold;
+        }
+        
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .best-selling-container {
+                flex-wrap: wrap; /* Stack items on smaller screens */
+            }
+            .best-selling {
+                max-width: 48%;  /* Show two items per row */
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .best-selling {
+                max-width: 100%;  /* Full width on small screens */
+            }
+        }
+        
+
+
+
+
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .date-filter {
+                flex-wrap: wrap;
+            }
+            
+            .metrics-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1 class="dashboard-title">Sales Dashboard</h1>
+            <div class="date-filter">
+                <label>Date Range:</label>
+                <div class="quick-links">
+                    <a href="?date_range=today" class="quick-link {% if date_range == 'today' %}active{% endif %}">Today</a>
+                    <a href="?date_range=this_week" class="quick-link {% if date_range == 'this_week' %}active{% endif %}">This Week</a>
+                    <a href="?date_range=this_month" class="quick-link {% if date_range == 'this_month' %}active{% endif %}">This Month</a>
+                    <a href="?date_range=this_year" class="quick-link {% if date_range == 'this_year' %}active{% endif %}">This Year</a>
+                </div>
+            
+                <label>Custom:</label>
+                <form id="dateFilterForm" method="GET" onsubmit="removeDateRange()">
+                    <input type="date" id="start-date" name="start_date" value="{{ start_date|date:'Y-m-d' }}">
+                    <input type="date" id="end-date" name="end_date" value="{{ end_date|date:'Y-m-d' }}">
+                    <button type="submit">Filter</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="best-selling-container">
+            <!-- ✅ Top 10 Best-Selling Products -->
+            <div class="best-selling">
+                <h3>🔥 Top 10 Best-Selling Products</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity Sold</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in best_selling_products %}
+                        <tr>
+                            <td>{{ product.product__name }}</td>
+                            <td>{{ product.total_quantity }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2">No sales data available</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        
+            <!-- ✅ Top 10 Best-Selling Categories -->
+            <div class="best-selling">
+                <h3>📦 Top 10 Best-Selling Categories</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Quantity Sold</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in best_selling_categories %}
+                        <tr>
+                            <td>{{ category.product__category__name }}</td>
+                            <td>{{ category.total_quantity }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2">No sales data available</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        
+        </div>
+
+
+
+
+
+
+
+
+
+        <div class="metrics-container">
+            <div class="metric-card">
+                <span class="metric-title">Overall Sales Count</span>
+                <span class="metric-value">{{ overall_sales_count }}</span>
+                
+            </div>
+            
+            <div class="metric-card">
+                <span class="metric-title">Overall Order Amount</span>
+                <span class="metric-value">₹{{ overall_order_amount }}</span>
+
+            </div>
+            
+            <div class="metric-card">
+                <span class="metric-title">Overall Discount</span>
+                <span class="metric-value">₹{{ overall_discount }}</span>
+            </div>
+            
+        </div>
+
+       <!-- Search Bar -->
+       <form method="GET" class="search-form">
+        <input type="hidden" name="date_range" value="{{ date_range }}">
+        <input type="hidden" name="start_date" value="{{ start_date|date:'Y-m-d' }}">
+        <input type="hidden" name="end_date" value="{{ end_date|date:'Y-m-d' }}">
+        
+        <input type="text" name="search" value="{{ search_query }}" placeholder="Search Order ID, Customer Name, or Status">
+        <button type="submit">Search</button>
+    </form>
+        
+        <div class="data-container">
+            <div class="data-header">
+                <h2 class="data-title">Sales Report</h2>
+                <div class="export-options">
+                    <button type="button" class="export-btn pdf">Export as PDF</button>
+                </div>
+            </div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Items</th>
+                        <th>Amount</th>
+                        <th>Discount</th>
+                        <th>Final Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.created_at|date:"M d, Y" }}</td>
+                        <td>{{ order.user.username }}</td>
+                        <td>{{ order.items.count }}</td>
+                        <td>{{ order.subtotal }}</td>
+                        <td>{{ order.total_discount }}</td>
+                        <td>{{ order.total_amount }}</td>
+                        <td>
+                            <span class="status-pill status-{{ order.status|lower }}">{{ order.status }}</span>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+           <!-- Pagination Controls -->
+           <div class="pagination">
+            {% if orders.has_previous %}
+                <a href="?page=1&date_range={{ date_range }}&search={{ search_query }}&start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}" class="page-link">First</a>
+                <a href="?page={{ orders.previous_page_number }}&date_range={{ date_range }}&search={{ search_query }}&start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}" class="page-link">Previous</a>
+            {% endif %}
+        
+            <span class="current-page">Page {{ orders.number }} of {{ orders.paginator.num_pages }}</span>
+        
+            {% if orders.has_next %}
+                <a href="?page={{ orders.next_page_number }}&date_range={{ date_range }}&search={{ search_query }}&start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}" class="page-link">Next</a>
+                <a href="?page={{ orders.paginator.num_pages }}&date_range={{ date_range }}&search={{ search_query }}&start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}" class="page-link">Last</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+    <script>
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+            let pdfButton = document.querySelector(".export-btn.pdf");
+        
+            if (pdfButton) {
+                pdfButton.addEventListener("click", function (event) {
+                    event.preventDefault(); // Prevent any unwanted behavior
+        
+                    // Get the selected date range
+                    let startDate = document.getElementById("start-date").value;
+                    let endDate = document.getElementById("end-date").value;
+        
+                    if (!startDate || !endDate) {
+                        alert("Please select a date range before exporting.");
+                        return;
+                    }
+        
+                    // Redirect to the PDF export URL
+                    let exportUrl = `/export-sales-report-pdf/?start_date=${startDate}&end_date=${endDate}`;
+                    window.location.href = exportUrl;
+                });
+            } else {
+                console.error("Export PDF button not found!");
+            }
+        });
+        
+            function removeDateRange() {
+                // ✅ Remove date_range from URL when custom dates are selected
+                let urlParams = new URLSearchParams(window.location.search);
+                urlParams.delete('date_range');
+                history.replaceState(null, '', '?' + urlParams.toString());
+            }
+        
+
+
+           
+
+    </script>
+</body>
+{% endblock %}
+
+
+
