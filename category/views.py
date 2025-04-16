@@ -57,7 +57,7 @@ def add_category(request):
             image=category_image,
             is_active=True
         )
-        print(f"Category '{category_name}' added with description: {description}")
+        # print(f"Category '{category_name}' added with description: {description}")
         return redirect('category_list')  # Adjust the redirect URL as needed
 
     return render(request, 'admin/add_category.html')

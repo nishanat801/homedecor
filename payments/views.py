@@ -28,16 +28,16 @@ def pay_view(request):
     razorpay_order = Order.objects.filter(user=request.user, payment_status="Pending").order_by('-created_at').first()
 
     if not razorpay_order:
-        print("No pending order found, redirecting to checkout")
+        # print("No pending order found, redirecting to checkout")
         return redirect("orders:checkout_page")  
 
-    print("Found order:", razorpay_order)  # Debugging print
+    # print("Found order:", razorpay_order)  # Debugging print
 
     applied_coupon_code = request.session.get("applied_coupon_code")
     discount_amount = Decimal(0)  # Use Decimal for consistency
 
     if applied_coupon_code:
-        print("Applied Coupon Code from session:", applied_coupon_code)
+        # print("Applied Coupon Code from session:", applied_coupon_code)
 
         coupon = Coupon.objects.filter(code=applied_coupon_code, is_active=True, expiry_date__gte=timezone.now().date()).first()
         
@@ -45,7 +45,7 @@ def pay_view(request):
             discount_percentage = float(coupon.discount_percentage) 
 
             discount_amount = min(Decimal(discount_percentage / 100) * Decimal(razorpay_order.subtotal), Decimal(coupon.max_discount))
-            print("Discount Calculated:", discount_amount)
+            # print("Discount Calculated:", discount_amount)
 
     total_amount = razorpay_order.subtotal - discount_amount
 
@@ -156,7 +156,7 @@ def checkout_razorpay(request):
 
            # Update our order with Razorpay order ID
             order.razorpay_order_id = razorpay_order["id"]
-            print(order.razorpay_order_id)
+            # print(order.razorpay_order_id)
             order.save()
 
             return JsonResponse({
@@ -289,10 +289,10 @@ def payment_success_page(request):
 
     coupon_usage = CouponUsage.objects.filter(user=request.user).order_by('-used_at').first()
     discount_amount = coupon_usage.discount_amount if coupon_usage else 0
-    print(discount_amount)
+    # print(discount_amount)
 
     payment_id = order.razorpay_payment_id if order.razorpay_payment_id else "N/A"
-    print(payment_id)
+    # print(payment_id)
 
     context = {
         'order_id': order.id,
@@ -317,7 +317,7 @@ def payment_failed(request):
             error_code = data.get("error_code")
             error_description = data.get("error_description")
 
-            print(f"Received payment failure data: {data}")  # Log the incoming data
+            # print(f"Received payment failure data: {data}")  # Log the incoming data
 
             if not razorpay_order_id:
                 return JsonResponse({"status": "failed", "message": "Invalid data received"}, status=400)
@@ -331,11 +331,11 @@ def payment_failed(request):
             request.session.pop("applied_coupon_code", None)
             request.session.pop("applied_coupon_code", None)
 
-            print(f"Updated order with Razorpay order ID {razorpay_order_id}")  # Log the update
+            # print(f"Updated order with Razorpay order ID {razorpay_order_id}")  # Log the update
 
             return JsonResponse({"status": "success", "message": "Payment failure recorded"})
         except Exception as e:
-            print(f"Error processing payment failure: {e}")  # Log errors
+            # print(f"Error processing payment failure: {e}")  # Log errors
             return JsonResponse({"status": "failed", "message": str(e)}, status=500)
 
     return JsonResponse({"status": "failed", "message": "Invalid request!"}, status=400)
@@ -344,12 +344,12 @@ def payment_failed(request):
 
 def payment_failed_page(request):
     razorpay_order_id = request.GET.get("order_id")  # Razorpay order ID received
-    print("Received Razorpay Order ID:", razorpay_order_id)
+    # print("Received Razorpay Order ID:", razorpay_order_id)
 
     order = get_object_or_404(Order, razorpay_order_id=razorpay_order_id)  # Get Order model ID
     order_id = order.id  # Store the correct Order model ID
 
-    print("Mapped Order ID:", order_id)
+    # print("Mapped Order ID:", order_id)
     return render(request, "user/payment_failed.html", {"order_id": order_id})
     
 
@@ -382,10 +382,10 @@ def pay_retry(request,order_id):
     razorpay_order = Order.objects.filter(user=request.user, payment_status="Pending").order_by('-created_at').first()
 
     if not razorpay_order:
-        print("No pending order found, redirecting to checkout")
+        # print("No pending order found, redirecting to checkout")
         return redirect("orders:checkout_page")  
 
-    print("Found order:", razorpay_order)  # Debugging print
+    # print("Found order:", razorpay_order)  # Debugging print
 
     return render(request, "user/pay.html", {
         "razorpay_order_id": razorpay_order.razorpay_order_id,
@@ -407,8 +407,8 @@ def wallet_view(request):
     # Get all transactions related to this wallet
     transactions = WalletTransaction.objects.filter(wallet=wallet).order_by('-date')
 
-    print(f"Wallet Balance: {wallet.balance}")
-    print(f"Transactions: {transactions}")
+    # print(f"Wallet Balance: {wallet.balance}")
+    # print(f"Transactions: {transactions}")
 
     return render(request, "user/wallet.html", {"wallet": wallet, "transactions": transactions})
 

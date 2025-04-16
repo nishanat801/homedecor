@@ -66,12 +66,12 @@ def signup_view(request):
                 user.otp = otp
                 user.otp_expiry = now() + datetime.timedelta(minutes=5)
                 user.save()
-                print("User saved:", user.email)
+                # print("User saved:", user.email)
 
                 # Store email in session
                 request.session['email'] = user.email
                 request.session.save()
-                print("Session saved with email:", user.email)
+                # print("Session saved with email:", user.email)
 
                 # Send OTP via email
                 if send_otp_email(user.email, otp):
@@ -106,7 +106,7 @@ def otp_verify_view(request):
     if request.method == 'POST':
         otp = request.POST.get('otp')  # Get entered OTP
 
-        print(f"Stored email from session: {email}")
+        # print(f"Stored email from session: {email}")
 
         user = User.objects.filter(email__iexact=email).first()
 
@@ -114,17 +114,14 @@ def otp_verify_view(request):
             messages.error(request, 'User not found. Please try again.')
             return redirect('Authentication:otp_verify')
 
-        print(f"Stored OTP: {user.otp}, Entered OTP: {otp}")
-        print(f"OTP Expiry: {user.otp_expiry}, Current Time: {timezone.now()}")
+        # print(f"Stored OTP: {user.otp}, Entered OTP: {otp}")
+        # print(f"OTP Expiry: {user.otp_expiry}, Current Time: {timezone.now()}")
 
         if user.otp == otp and user.otp_expiry > timezone.now():
             user.is_active = True
             user.otp = None  # Clear OTP after verification
             user.otp_expiry = None
-            user.save()
-
-
-            
+            user.save() 
             # Clear session
             del request.session['email']
 
@@ -321,8 +318,6 @@ def admin_login(request):
     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0'
     return response
 
-
-from products.models import Product
 @never_cache
 def admin_logout(request):
     request.session.flush()

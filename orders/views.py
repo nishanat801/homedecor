@@ -45,8 +45,7 @@ def checkout_page(request):
         expiry_date__gte=timezone.now().date(),
         min_amount__lte=subtotal  # Ensure subtotal meets minimum requirement
     ).exclude(id__in=CouponUsage.objects.filter(user=request.user).values_list("coupon_id", flat=True))
-
-    print("Available Coupons:", available_coupons)
+    # print("Available Coupons:", available_coupons)
 
     discount_amount = 0
     applied_coupon = None
@@ -262,7 +261,7 @@ def user_order_list(request):
         }
 
         for item in order.items.all():
-            print(f"Item ID: {item.id}, Name: {item.product.name}, Status: {item.status}")  # Debugging print
+            # print(f"Item ID: {item.id}, Name: {item.product.name}, Status: {item.status}")  # Debugging print
 
             order_data['items'].append({
                 'id': item.id,  # Ensure this exists
@@ -460,7 +459,7 @@ def admin_order_details(request, order_id):
                 with transaction.atomic():
                     if new_status == "Refunded" and order_item.status == "Requested for Refund":
                         order_item.product.stock += Decimal(str(order_item.quantity))
-                        print(type(order_item.quantity), type(order_item.product.stock))
+                        # print(type(order_item.quantity), type(order_item.product.stock))
                         # Process refund to wallet
                         wallet, created = Wallet.objects.get_or_create(user=order.user)
                         wallet.credit(order_item.final_amount)

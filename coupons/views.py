@@ -25,12 +25,9 @@ def apply_coupon(request):
             coupon_code = data.get("code", "").strip()
             total_amount = float(data.get("total_amount", 0))
 
-            print("📢 Received Coupon Code:", coupon_code)
-            print("📢 Total Amount:", total_amount)
-
             # ✅ Check if coupon exists
             coupon = Coupon.objects.filter(code=coupon_code, is_active=True, expiry_date__gte=timezone.now().date()).first()
-            print("📢 Coupon Object:", coupon)
+            # print("📢 Coupon Object:", coupon)
 
             if not coupon:
                 return JsonResponse({"success": False, "error": "Coupon not found or expired."}, status=400)
@@ -43,10 +40,10 @@ def apply_coupon(request):
 
             # ✅ Apply discount with max limit
             discount_amount = min((coupon.discount_percentage / 100) * total_amount, coupon.max_discount)
-            print("📢 Discount Amount:", discount_amount)
+            # print("📢 Discount Amount:", discount_amount)
             
             final_total = total_amount - float(discount_amount)
-            print("📢 Final Total After Discount:", final_total)
+            # print("📢 Final Total After Discount:", final_total)
 
             # ✅ Save the coupon usage for this user
             # CouponUsage.objects.create(user=request.user, coupon=coupon,final_total=final_total,discount_amount=discount_amount).save()
@@ -61,7 +58,7 @@ def apply_coupon(request):
             })
 
         except Exception as e:
-            print("❌ Internal Server Error:", e)
+            # print("❌ Internal Server Error:", e)
             return JsonResponse({"success": False, "error": str(e)}, status=500)
        
 
