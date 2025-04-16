@@ -29,7 +29,6 @@ def search_products(request):
     
     return JsonResponse({"products": product_data})
 
-@login_required
 def crop_resize_image(image, size=(300, 300)):
     """Resize and crop the image to the given size."""
     img = Image.open(image)
