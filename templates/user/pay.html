@@ -152,13 +152,15 @@
         
         var options = {
             "key": "{{ razorpay_key }}",
-            "amount": parseInt("{{ total_amount|floatformat:0 }}") * 100,  // ✅ Corrected amount formatting
+            "amount": Math.round(parseFloat("{{ total_amount }}") * 100)  // ✅ Corrected amount formatting
             "currency": "INR",
             "name": "Your Store Name",
             "description": "Order Payment",
             "order_id": "{{ razorpay_order_id }}",
             "handler": function (response) {
                 console.log("Razorpay Response:", response);  // ✅ Debugging Razorpay response
+                console.log("Razorpay Key:", "{{ razorpay_key }}");
+                console.log("Razorpay Order ID:", "{{ razorpay_order_id }}");
 
                 fetch('/payment-success/', {
                     method: 'POST',

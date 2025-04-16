@@ -114,7 +114,7 @@ def otp_verify_view(request):
             messages.error(request, 'User not found. Please try again.')
             return redirect('Authentication:otp_verify')
 
-        # print(f"Stored OTP: {user.otp}, Entered OTP: {otp}")
+        #print(f"Stored OTP: {user.otp}, Entered OTP: {otp}")
         # print(f"OTP Expiry: {user.otp_expiry}, Current Time: {timezone.now()}")
 
         if user.otp == otp and user.otp_expiry > timezone.now():
