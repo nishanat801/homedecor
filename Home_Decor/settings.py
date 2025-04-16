@@ -10,13 +10,20 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-from pathlib import Path
 from django.contrib.messages import constants as messages
 from decouple import config
+from pathlib import Path
+import os
 
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -28,7 +35,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['fhomedec.site', 'www.fhomedec.site', '13.48.44.130']
 
 SITE_ID = 1
 
@@ -76,7 +83,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'Home_Decor.urls'
 
-import os
+
 
 TEMPLATES = [
     {
@@ -159,13 +166,10 @@ USE_TZ = True
 
 LOGIN_URL = '/login/'
 
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'  
-STATICFILES_DIRS = [BASE_DIR / "static"]
 
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
 
 
 # Default primary key field type
