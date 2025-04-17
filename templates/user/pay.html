@@ -149,18 +149,6 @@
 <script>
     document.getElementById('rzp-button').onclick = function (e) {
         e.preventDefault();
-        console.log("Pay button clicked");
-
-    if (typeof Razorpay === 'undefined') {
-        console.error("Razorpay SDK not loaded");
-        alert("Payment system failed to initialize.");
-        return;
-    }
-
-    console.log("Razorpay Key:", "{{ razorpay_key }}");
-    console.log("Total Amount:", "{{ total_amount|floatformat:0 }}");
-    console.log("Razorpay Order ID:", "{{ razorpay_order_id }}");
-    console.log("CSRF Token:", "{{ csrf_token }}");
         
         var options = {
             "key": "{{ razorpay_key }}",
