@@ -162,102 +162,84 @@
     console.log("Razorpay Order ID:", "{{ razorpay_order_id }}");
     console.log("CSRF Token:", "{{ csrf_token }}");
         
-    var options = {
-        "key": "{{ razorpay_key }}",
-        "amount": parseInt("{{ total_amount|floatformat:0 }}") * 100,
-        "currency": "INR",
-        "name": "Your Store Name",
-        "description": "Order Payment",
-        "order_id": "{{ razorpay_order_id }}",
-        "handler": function (response) {
-            console.log("Razorpay Response:", response);
-            fetch('/payment-success/', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    order_id: response.razorpay_order_id,
-                    payment_id: response.razorpay_payment_id,
-                    signature: response.razorpay_signature
-                })
-            })
-            .then(res => {
-                console.log("Payment success fetch status:", res.status);
-                return res.json();
-            })
-            .then(data => {
-                console.log("Server Response:", data);
-                if (data.status === "success") {
-                    alert("Payment successful! Payment ID: " + response.razorpay_payment_id);
-                    window.location.href = "/payment_success_page/";
-                } else {
-                    alert("Payment failed: " + data.message);
-                }
-            })
-            .catch(error => {
-                console.error("Error in fetch:", error);
-                alert("An error occurred. Please try again.");
-            });
-        },
-        "modal": {
-            "ondismiss": function () {
-                console.log("Payment window closed - marking as failed");
-                var orderId = "{{ razorpay_order_id }}";
-                console.log("Order ID:", orderId);
-                fetch('/payment-failed/', {
+        var options = {
+            "key": "{{ razorpay_key }}",
+            "amount": parseInt("{{ total_amount|floatformat:0 }}") * 100,  // ✅ Corrected amount formatting
+            "currency": "INR",
+            "name": "Your Store Name",
+            "description": "Order Payment",
+            "order_id": "{{ razorpay_order_id }}",
+            "handler": function (response) {
+                console.log("Razorpay Response:", response);  // ✅ Debugging Razorpay response
+
+                fetch('/payment-success/', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        razorpay_order_id: orderId,
-                        error_code: "modal_closed",
-                        error_description: "User closed payment modal"
+                        order_id: response.razorpay_order_id,
+                        payment_id: response.razorpay_payment_id,
+                        signature: response.razorpay_signature
                     })
                 })
-                .then(response => {
-                    console.log("Payment failure fetch status:", response.status);
-                    return response.json();
-                })
+                .then(res => res.json())
                 .then(data => {
-                    console.log("Failure response:", data);
+                    console.log("Server Response:", data);  // ✅ Debugging server response
                     if (data.status === "success") {
-                        window.location.href = "/payment-failed-page/?order_id=" + orderId;
+                        alert("Payment successful! Payment ID: " + response.razorpay_payment_id);
+                        window.location.href = "/payment_success_page/";
                     } else {
-                        alert("Failed to record payment failure: " + data.message);
+                        alert("Payment failed: " + data.message);
                     }
                 })
                 .catch(error => {
-                    console.error("Error:", error);
-                    alert("An error occurred while recording payment failure");
+                    console.error("Error in fetch:", error);  // ✅ Debugging fetch errors
+                    alert("An error occurred. Please try again.");
                 });
+            },
+
+
+         "modal": {
+    "ondismiss": function () {
+        console.log("Payment window closed - marking as failed");
+        
+        // Log the order ID to ensure it's available
+        var orderId = "{{ razorpay_order_id }}";
+        console.log("Order ID: " + orderId);
+
+        fetch('/payment-failed/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                razorpay_order_id: orderId,
+                error_code: "modal_closed",
+                error_description: "User closed payment modal"
+            })
+        })
+        .then(response => {
+            console.log("Payment failure fetch response status: ", response.status);  // Log response status
+            return response.json();
+        })
+        .then(data => {
+            console.log("Failure response:", data);  // Log server response
+            if (data.status === "success") {
+                window.location.href = "/payment-failed-page/?order_id=" + orderId;
+            } else {
+                alert("Failed to record payment failure: " + data.message);
             }
-        }
-    };
-
-    console.log("Razorpay Options:", options);
-    try {
-        var rzp = new Razorpay(options);
-        console.log("Opening Razorpay modal");
-        rzp.open();
-
-        // Workaround for SVG height error
-        setTimeout(() => {
-            const svgs = document.querySelectorAll('svg[height="auto"]');
-            svgs.forEach(svg => {
-                console.log("Fixing SVG height:", svg);
-                svg.setAttribute('height', '75px'); // Match viewBox dimensions
-                svg.setAttribute('width', '75px');  // Ensure consistent sizing
-            });
-        }, 1000); // Delay to ensure modal is loaded
-    } catch (error) {
-        console.error("Razorpay Initialization Error:", error);
-        alert("Failed to initialize payment. Please try again.");
+        })
+        .catch(error => {
+            console.error("Error:", error);  // Log any errors in the fetch process
+            alert("An error occurred while recording payment failure");
+        });
     }
-};
+},
+
 
 
             "prefill": {
