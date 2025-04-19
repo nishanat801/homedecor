@@ -245,6 +245,8 @@ def payment_success(request):
                 order.razorpay_signature = razorpay_signature
                 order.save()
 
+                request.session["latest_order_id"] = order.id
+
                 # ✅ Create CouponUsage record after order is placed
                 if applied_coupon:
                     CouponUsage.objects.create(
@@ -276,23 +278,23 @@ def payment_success(request):
 
 
 
-@login_required
 def payment_success_page(request):
-    razorpay_order_id = request.session.get('razorpay_order_id')  # Or fetch from request
+    order_id = request.session.get("latest_order_id")
 
-    orders = Order.objects.filter(razorpay_order_id=razorpay_order_id)
-    if not orders.exists():
+    if not order_id:
+        return JsonResponse({"status": "failed", "message": "Order not found in session"}, status=404)
+
+    try:
+        order = Order.objects.get(id=order_id, user=request.user)
+    except Order.DoesNotExist:
         return JsonResponse({"status": "failed", "message": "Order not found"}, status=404)
 
-    order = orders.latest('created_at')  
     order_items = OrderItem.objects.filter(order=order)
 
     coupon_usage = CouponUsage.objects.filter(user=request.user).order_by('-used_at').first()
     discount_amount = coupon_usage.discount_amount if coupon_usage else 0
-    # print(discount_amount)
 
-    payment_id = order.razorpay_payment_id if order.razorpay_payment_id else "N/A"
-    # print(payment_id)
+    payment_id = order.razorpay_payment_id or "N/A"
 
     context = {
         'order_id': order.id,
@@ -302,8 +304,11 @@ def payment_success_page(request):
         'order_items': order_items,
         'order': order
     }
-    return render(request, "user/payment_success.html", context)
 
+    # ✅ Optional: Clear session after use
+    request.session.pop("latest_order_id", None)
+
+    return render(request, "user/payment_success.html", context)
 
 
 
