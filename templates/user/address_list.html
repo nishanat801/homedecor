@@ -230,6 +230,7 @@
 
 
 
+{% block scripts %}
 <script>
     function toggleAddresses(event) {
         event.preventDefault();
@@ -240,6 +241,10 @@
     function showAddressForm(event) {
         event.preventDefault();
         document.getElementById('address-form-section').style.display = 'block';
+    }
+
+    function cancelAddressForm() {
+        document.getElementById('address-form-section').style.display = 'none';
     }
 
     function setDefaultAddress(radio) {
@@ -257,10 +262,8 @@
         });
     }
 
-    function cancelAddressForm() {
-        document.getElementById('address-form-section').style.display = 'none';  // Hide address form
-        document.querySelector('form').style.display = 'block';  // Show the address selection form
-    }
+    console.log("✅ Address JS loaded");
 </script>
+{% endblock %}
 {% endblock %}
 

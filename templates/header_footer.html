@@ -290,7 +290,7 @@
       </div>
     </footer>
   </div>
-
+  {% block scripts %}
   <script>
     document.getElementById("searchInput").addEventListener("input", function() {
         let query = this.value;
@@ -323,5 +323,6 @@
         }
     });
     </script>
+    {% endblock %}
 </body>
 </html>
