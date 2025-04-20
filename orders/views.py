@@ -91,6 +91,8 @@ def order_success(request, order_id):
     # Fetch the order and its related items
     order = get_object_or_404(Order, id=order_id, user=request.user)
     order_items = OrderItem.objects.filter(order=order)
+
+    request.session.pop("latest_order_id", None)
     
     # Render the order success page with product details
     context = {
