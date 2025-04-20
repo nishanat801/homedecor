@@ -110,6 +110,7 @@ def place_order(request):
     if request.method == "POST":
         user = request.user
         selected_address_id = request.session.get("selected_address_id")
+        
 
         if not selected_address_id:
             messages.error(request, "No address selected. Please select an address.")
@@ -177,6 +178,7 @@ def place_order(request):
                 total_amount=subtotal - total_discount,  
                 total_discount=total_discount,  
             )
+            request.session["latest_order_id"] = order.id
 
             for item in cart_items:
                 discount_amount = discount_per_item.get(item.id, 0)
@@ -210,7 +212,6 @@ def place_order(request):
 
             # ✅ Clear the applied coupon from the session after the order
             request.session.pop("applied_coupon_code", None)
-            request.session.pop("latest_order_id", None)
 
             # ✅ Clear the cart
             cart_items.delete()
