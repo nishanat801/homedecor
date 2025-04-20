@@ -210,6 +210,7 @@ def place_order(request):
 
             # ✅ Clear the applied coupon from the session after the order
             request.session.pop("applied_coupon_code", None)
+            request.session.pop("latest_order_id", None)
 
             # ✅ Clear the cart
             cart_items.delete()
